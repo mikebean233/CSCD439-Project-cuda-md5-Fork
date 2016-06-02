@@ -53,6 +53,16 @@ bool BruteIncrement(unsigned char* brute, int setLen, int wordLength, int increm
 
 int main( int argc, char** argv) 
 {
+	char* inputString argv[1];
+	uint a,b,c,d;
+	md5_vfy(inputString, strlen(inputString), &a, &b, &c, &d);
+
+	printf("hash for %s: \na: %d\nb: %d\nc: %d\nd: %d", inputString, a,b,c,d);
+	
+
+	return 0;
+
+
 	int wordLength = 7;
 	int charSetLen = 0;
 
