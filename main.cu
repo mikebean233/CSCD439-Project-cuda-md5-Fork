@@ -87,7 +87,7 @@ int main( int argc, char** argv)
 
 	//turn the correct hash into it's four parts
 	//uint v1, v2, v3, v4;
-	md5_to_ints(hash,&v1,&v2,&v3,&v4);
+	//md5_to_ints(hash,&v1,&v2,&v3,&v4);
 
 	//zero the container used to hold the correct pass
 	cudaMemcpyToSymbol(correctPass, &cpuCorrectPass, MAX_TOTAL, 0, cudaMemcpyHostToDevice);
