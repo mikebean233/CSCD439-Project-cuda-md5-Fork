@@ -53,14 +53,16 @@ bool BruteIncrement(unsigned char* brute, int setLen, int wordLength, int increm
 
 int main( int argc, char** argv) 
 {
-	char* inputString argv[1];
-	uint a,b,c,d;
-	md5_vfy(inputString, strlen(inputString), &a, &b, &c, &d);
+	char* inputString = (char*) malloc(sizeof(char) * strlen(argv[1]));
+	strcpy(inputString, argv[1]);
+	uint v1,v2,v3,v4;
+	md5_vfy((unsigned char*)inputString, strlen(inputString), &v1, &v2, &v3, &v4);
 
-	printf("hash for %s: \na: %d\nb: %d\nc: %d\nd: %d", (unsigned char*) inputString, a,b,c,d);
+	printf("hash for %s: %#x%x%x%x\n", inputString, v1,v2,v3,v4);
 
 
-	return 0;
+
+//	return 0;
 
 
 	int wordLength = 7;
@@ -80,11 +82,11 @@ int main( int argc, char** argv)
 	unsigned char charSet[charSetLen];
 	memcpy(charSet, "abcdefghijklmnopqrstuvwxyz", charSetLen);
 
-	unsigned char hash[32];
-	memcpy(hash, "f0e8fb430bbdde6ae9c879a518fd895f", 32);
+	//unsigned char hash[32];
+	//memcpy(hash, "f0e8fb430bbdde6ae9c879a518fd895f", 32);
 
 	//turn the correct hash into it's four parts
-	uint v1, v2, v3, v4;
+	//uint v1, v2, v3, v4;
 	md5_to_ints(hash,&v1,&v2,&v3,&v4);
 
 	//zero the container used to hold the correct pass
