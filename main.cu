@@ -57,8 +57,8 @@ int main( int argc, char** argv)
 	uint a,b,c,d;
 	md5_vfy(inputString, strlen(inputString), &a, &b, &c, &d);
 
-	printf("hash for %s: \na: %d\nb: %d\nc: %d\nd: %d", inputString, a,b,c,d);
-	
+	printf("hash for %s: \na: %d\nb: %d\nc: %d\nd: %d", (unsigned char*) inputString, a,b,c,d);
+
 
 	return 0;
 
