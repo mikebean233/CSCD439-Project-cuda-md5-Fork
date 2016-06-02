@@ -123,7 +123,7 @@ int main( int argc, char** argv)
 			printf("\n");
 		}
 		ct++;
-		checkCUDAError();
+		//checkCUDAError();
 	} while(!finished);
 
 	return 0;
