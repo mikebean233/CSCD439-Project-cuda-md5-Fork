@@ -35,27 +35,16 @@ __global__ void crack(uint numThreads, uint charSetLen, uint bruteLength, uint v
 	i = 0;
 	int ary_i = 0;
 	unsigned char tmp = 0;
-	while((tmp = cudaLeftSalt[ary_i]) != 0)
-	{
-		word[i] = tmp;
-		i++; ary_i++;
-	}
-	bruteStart = i;
+
+	bruteStart = 0;
 	i+= bruteLength;
 	ary_i = 0;
-	while((tmp = cudaRightSalt[ary_i]) != 0)
-	{
-		word[i] = tmp;
-		i++; ary_i++;
-	}
-	totalLen = i;
+	totalLen = bruteLength;
 
 	IncrementBruteGPU(ourBrute, charSetLen, bruteLength, idx);
 	int timer = 0;
 	for(timer = 0; timer < MD5_PER_KERNEL; timer++)
 	{
-		
-		
 		//Now, substitute the values into the string
 		for(i = 0; i < bruteLength; i++)
 		{
