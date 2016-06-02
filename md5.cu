@@ -64,7 +64,7 @@
    (a) += (b); \
   }
 
-__device__ void md5_vfy(unsigned char* data, uint length, uint *a1, uint *b1, uint *c1, uint *d1)
+__host__ __device__ void md5_vfy(unsigned char* data, uint length, uint *a1, uint *b1, uint *c1, uint *d1)
 {
 
 	const uint a0 = 0x67452301;
