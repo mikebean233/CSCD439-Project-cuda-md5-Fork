@@ -104,10 +104,12 @@ int main( int argc, char** argv)
 
 	bool finished = false;
 	int ct = 0;
-        float average_simple_time = 0;
-	
+
+
+	cudaEventRecord(launch_begin,0);
+
 	do{
-		cudaEventRecord(launch_begin,0);
+
 
 		cudaMemcpyToSymbol(cudaBrute, &currentBrute, MAX_BRUTE_LENGTH, 0, cudaMemcpyHostToDevice);
 		
@@ -134,9 +136,8 @@ int main( int argc, char** argv)
 			cudaEventSynchronize(launch_end);
 			float time = 0;
 			cudaEventElapsedTime(&time, launch_begin, launch_end);
-			average_simple_time += time;
-			average_simple_time /= ct;
-			printf("done! GPU time cost in second: %f\n", average_simple_time  / 1000);
+
+			printf("done! GPU time cost in second: %f ms\n", time / 1000);
 			return 0;
 		}
 		
@@ -153,17 +154,10 @@ int main( int argc, char** argv)
 			printf("\n");
 		}
 		ct++;
-		cudaEventRecord(launch_end,0);
-		cudaEventSynchronize(launch_end);
-		// measure the time spent in the kernel
-		float time = 0;
-		cudaEventElapsedTime(&time, launch_begin, launch_end);
-		average_simple_time += time;
+
 		//checkCUDAError();
 	} while(!finished);
-	
-	average_simple_time /= ct;
-	printf("done! GPU time cost in second: %f\n", average_simple_time  / 1000);
+
 
 	return 0;
 }
