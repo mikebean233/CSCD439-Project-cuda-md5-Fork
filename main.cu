@@ -65,7 +65,8 @@ int main( int argc, char** argv)
 //	return 0;
 
 
-	int wordLength = 7;
+	//int wordLength = 7;
+	int wordLength = strlen(argv[1]);
 	int charSetLen = 0;
 
 
