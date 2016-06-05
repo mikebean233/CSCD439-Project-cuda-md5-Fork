@@ -57,7 +57,11 @@ int main( int argc, char** argv)
 	strcpy(inputString, argv[1]);
 	uint v1,v2,v3,v4;
 	md5_vfy((unsigned char*)inputString, strlen(inputString), &v1, &v2, &v3, &v4);
-
+	
+	cudaEvent_t launch_begin, launch_end;
+	cudaEventCreate(&launch_begin);
+	cudaEventCreate(&launch_end);
+	
 	printf("hash for %s: %#x%x%x%x\n", inputString, v1,v2,v3,v4);
 
 
@@ -68,6 +72,8 @@ int main( int argc, char** argv)
 	//int wordLength = 7;
 	int wordLength = strlen(argv[1]);
 	int charSetLen = 0;
+
+
 
 
 	int numThreads = BLOCKS * THREADS_PER_BLOCK;
@@ -98,7 +104,11 @@ int main( int argc, char** argv)
 
 	bool finished = false;
 	int ct = 0;
+        float average_simple_time = 0;
+	
 	do{
+		cudaEventRecord(launch_begin,0);
+
 		cudaMemcpyToSymbol(cudaBrute, &currentBrute, MAX_BRUTE_LENGTH, 0, cudaMemcpyHostToDevice);
 		
 		//run the kernel
@@ -120,6 +130,13 @@ int main( int argc, char** argv)
 				k++;
 			}
 			printf("\n");
+			cudaEventRecord(launch_end,0);
+			cudaEventSynchronize(launch_end);
+			float time = 0;
+			cudaEventElapsedTime(&time, launch_begin, launch_end);
+			average_simple_time += time;
+			average_simple_time /= ct;
+			printf("done! GPU time cost in second: %f\n", average_simple_time  / 1000);
 			return 0;
 		}
 		
@@ -136,8 +153,17 @@ int main( int argc, char** argv)
 			printf("\n");
 		}
 		ct++;
+		cudaEventRecord(launch_end,0);
+		cudaEventSynchronize(launch_end);
+		// measure the time spent in the kernel
+		float time = 0;
+		cudaEventElapsedTime(&time, launch_begin, launch_end);
+		average_simple_time += time;
 		//checkCUDAError();
 	} while(!finished);
+	
+	average_simple_time /= ct;
+	printf("done! GPU time cost in second: %f\n", average_simple_time  / 1000);
 
 	return 0;
 }
