@@ -137,7 +137,7 @@ int main( int argc, char** argv)
 			float time = 0;
 			cudaEventElapsedTime(&time, launch_begin, launch_end);
 
-			printf("done! GPU time cost in second: %f ms\n", time / 1000);
+			printf("done! GPU time cost in second: %f s\n", time / 1000);
 			return 0;
 		}
 		
