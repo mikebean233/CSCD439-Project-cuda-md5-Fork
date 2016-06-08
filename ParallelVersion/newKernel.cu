@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+void usage(char* programName);
 /*
  *   Maximum number of threads per multiprocessor:  2048
  *   Maximum number of threads per block:           1024
@@ -20,9 +20,9 @@
 
 int main(int argc, char** argv){
     if(argc < 2)
-        usage(argv[0];
+        usage(argv[0]);
 
-    char* inputWord = (char*) calloc(strlen(argv[1]));
+    char* inputWord = (char*) calloc(strlen(argv[1]), sizeof(char));
     strcpy(inputWord, argv[1]);
 
     printf("%s\n", inputWord);
