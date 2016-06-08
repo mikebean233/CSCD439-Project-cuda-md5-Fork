@@ -25,9 +25,16 @@ int main(int argc, char **argv) {
         printf("word\t=\t\"%s\"\n", word);
         wordMD5 = getMD5(word);
         printf("wordMD5\t=\t\"%s\"\n", wordMD5);
+
+        long t0 = clock();
         guess(wordMD5, (int)strlen(word)); //word and wordHash have different length
+        long t1 = clock();
+
+        float dt = (t1-t0)/1000000.0;
+        printf("%lf sec\n", dt);
+        free(wordMD5);
+        wordMD5 = NULL;
     }
-    free(wordMD5);
     return 0;
 }
 
@@ -49,8 +56,8 @@ char *str2md5(const char *str) {
         length -= 512;
         str += 512;
     }
-
-    MD5_Final(digest, &c);
+    
+        MD5_Final(digest, &c);
 
     for (n = 0; n < 16; ++n) {
         snprintf(&(out[n*2]), 16*2, "%02x", (unsigned int)digest[n]);
@@ -69,9 +76,9 @@ char* getMD5(char *word) {
 }
 
 
-
 void guess(char *wordMD5, int n) {
     char cur[n+1];
+    char* curMD5;
     int counter[n];
     int i, nr_values = 94;
     // initialize
@@ -85,13 +92,15 @@ void guess(char *wordMD5, int n) {
             cur[i] = (char)(counter[i]+32);
             cur[i+1] = '\0';
         }
-        char* curMD5 = getMD5(cur);
+        curMD5 = getMD5(cur);
         //printf("cur=\"%s\"\n", cur);
         //printf("\ncur =\t\"%s\"\ncurHash =\t\"%s\"\nword =\t\"%s\"\n", cur, word);
         if(strcmp(curMD5, wordMD5)==0) {
             printf("FOUND\ncur\t=\t\"%s\"\ncurMD5\t=\t\"%s\"\n", cur, curMD5);
             break;
         }
+        free(curMD5);
+        curMD5 = NULL;
         // increment till the values overflow, starting from the last index
         i = n - 1;
         while (i >= 0) {
@@ -104,8 +113,6 @@ void guess(char *wordMD5, int n) {
         }
         // quit when first index overflows
     } while (i >= 0);
+    free(curMD5);
+    curMD5 = NULL;
 }
-
-
-
-
