@@ -30,8 +30,8 @@ __device__ unsigned char correctPass[MAX_TOTAL];
 
 void checkCUDAError(const char *msg);
 void usage(char* programName);
-void performSerialSearch(unsigned char* word, unsigned char* charSet, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose);
 void performParallelSearch(unsigned char* word, unsigned char* charSet, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose);
+void performSerialSearch(unsigned char* word, unsigned char* charSet, int wordLength, int charSetLength, uint v1, uint v2, uint v3, uint v4, int verbose);
 long longPow(int base, int exponent);
 int  intPow(int base, int exponent);
 
