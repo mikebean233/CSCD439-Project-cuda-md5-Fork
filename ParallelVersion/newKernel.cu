@@ -18,7 +18,7 @@
 #define MAX_BLOCK_Y 1024
 #define MAX_BLOCK_Z 64
 
-#define MAX_BATCH_SIZE 16000000
+//#define MAX_BATCH_SIZE 16000000
 
 __global__ void crack(uint wordLength, long beginningOffset, long batchSize, unsigned char *out, unsigned char *charMap, uint charSetLength, uint v1, uint v2, uint v3, uint v4){
     long long permutationNo = gridDim.x * blockIdx.y + blockIdx.x;
@@ -33,7 +33,7 @@ __global__ void crack(uint wordLength, long beginningOffset, long batchSize, uns
     thisWord[threadIdx.x] = charMap[thisValue];
     __syncthreads();
 
-    printf("permutation:  %d  beginningOffset: %ld  wordLength: %d\n", permutationNo, beginningOffset, wordLength);
+    //printf("permutation:  %d  beginningOffset: %ld  wordLength: %d\n", permutationNo, beginningOffset, wordLength);
     uint c1,c2,c3,c4;
     md5_vfy(thisWord, wordLength, &c1, &c2, &c3, &c4);
 
@@ -54,7 +54,7 @@ int main(int argc, char** argv){
     uint v1, v2, v3, v4;
     int inputWordLength;
     int charMapLength;
-    long noBatches, batchSize;
+    long noBatches, batchSize, MAX_BATCH_SIZE;
 
     // Configuration variables
     dim3 gridDim;
@@ -67,6 +67,9 @@ int main(int argc, char** argv){
     unsigned char* inputWord = (unsigned char*) calloc(strlen(argv[1]) + 1, sizeof(unsigned char));
     strcpy((char*)inputWord, argv[1]);
     inputWordLength = strlen((const char*)inputWord);
+
+    MAX_BATCH_SIZE = atol(argv[2]);
+
 
 
     // Generate hash
@@ -109,7 +112,7 @@ int main(int argc, char** argv){
     printf("Input Word: %s\nInput Word Length: %d\nCharacter Set:\"%s\"\nPossible Permutations: %d\n", inputWord, inputWordLength, h_charMap, noPermutations);
     printf("noBatches: %d\nbatchSize: %d\n", noBatches, batchSize );
 
-    int testWordLength = 1;
+    uint testWordLength = 1;
     for(; testWordLength <= inputWordLength; ++testWordLength) {
         blockDim.x = testWordLength;
         long batchNumber = 0;
