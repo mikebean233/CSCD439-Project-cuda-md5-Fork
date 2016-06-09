@@ -23,7 +23,7 @@ __device__ unsigned char correctPass[MAX_TOTAL];
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
-#include "timeing.h"
+#include "timing.h"
 
 #include "md5.cu" //This contains our MD5 helper functions
 #include "md5kernel.cu" //the CUDA thread
@@ -98,10 +98,9 @@ int main( int argc, char** argv) {
 	double timeBefore = currentTime();
 	if (performSerial) {
 		// ---------------------- CPU VERSION -----------------------------------
-
-
 		if (verboseMode)
-			printf("---------- Serial Version ---------------");
+			printf("---------- Serial Version ---------------\n");
+
 		long noCombinations = longPow(charSetLength, wordLength);
 		long combinationNo, combinationsThisRound;
 		int digitNo, thisGuessLength, thisDigitValue;
