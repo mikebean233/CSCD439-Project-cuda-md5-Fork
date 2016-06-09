@@ -18,10 +18,10 @@
 #define MAX_BLOCK_Y 1024
 #define MAX_BLOCK_Z 64
 
-__constant__ int v1,v1,v3,v4;
+__constant__ int v[4];
 __constant__ unsigned char charMap[26];
 
-__global__ void crack(uint wordLength, uint beginningOffset, long long batchSize, unsigned char *out, uint charSetLength, uint v1, uint v2, uint v3, uint v4){
+__global__ void crack(uint wordLength, uint beginningOffset, long long batchSize, unsigned char *out, uint charSetLength){
     long long permutationNo = gridDim.x * blockIdx.y + blockIdx.x;
 
     extern __shared__ unsigned char thisWord[];
@@ -37,7 +37,7 @@ __global__ void crack(uint wordLength, uint beginningOffset, long long batchSize
     printf("%s\n", thisWord);
     printf("permutationnNo: %ll   blockIdx.x: %d  threadIdx.x: %d\n", permutationNo, blockIdx.x, threadIdx.x);
     md5_vfy(thisWord, wordLength, &c1, &c2, &c3, &c4);
-    if(c1 == v1 && c2 == v2 && c3 == v3 && c4 == v4 ){
+    if(c1 == v[0] && c2 == v[1] && c3 == v[2] && c4 == v[3] ){
         out[threadIdx.x] = thisWord[threadIdx.x];
     }
 }
@@ -50,7 +50,8 @@ int main(int argc, char** argv){
 
     // Host
     unsigned char *h_charMap, *h_out;
-    uint h_wordLength, h_batchSize, h_charSetLength, v1, v2, v3, v4;
+    uint h_wordLength, h_batchSize, h_charSetLength;
+    uint *h_v;
     int inputWordLength;
     int charMapLength;
 
@@ -69,7 +70,7 @@ int main(int argc, char** argv){
 
 
     // Generate hash
-    md5_vfy(inputWord, inputWordLength, &v1, &v2, &v3, &v4);
+    md5_vfy(inputWord, inputWordLength, h_v, h_v + 1, h_v + 2, h_v + 3);
 
     // Allocate cpu memory
     char* staticCharSet = (char*)"abcdefghijklmnopqrstuvwxyz";
@@ -83,6 +84,7 @@ int main(int argc, char** argv){
     cudaMalloc((void **) &d_charMap, sizeof(unsigned char) * charMapLength);
     //cudaMalloc((void **) &d_out,     sizeof(unsigned char) * inputWordLength);
     cudaMemcpyToSymbol(charMap, h_charMap, charMapLength * sizeof(unsigned char), cudaMemcpyHostToDevice);
+    cudaMemcpyToSymbol(v, h_v, 4 * sizeof(uint), cudaMemcpyHostToDevice);
 
 
     // Calculate the number of possible permutations
@@ -102,7 +104,7 @@ int main(int argc, char** argv){
         gridDim.y  = 1;
         gridDim.z  = 1;
 
-        crack <<< gridDim, blockDim, testWordLength >>> (testWordLength, 0, noPermutations, d_out, d_charMap, charMapLength, v1, v2, v3, v4);
+        crack <<< gridDim, blockDim, testWordLength >>> (testWordLength, 0, noPermutations, d_out, d_charMap, charMapLength);
         cudaMemcpy(h_out, d_out, testWordLength, cudaMemcpyDeviceToHost);
         if(h_out[0] != '\0'){
             printf("Found match: %s\n", h_out);
