@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "md5.h"
+#include "md5.cu"
 /*
  *   Maximum number of threads per multiprocessor:  2048
  *   Maximum number of threads per block:           1024
@@ -87,12 +87,12 @@ int main(int argc, char** argv){
     }
 
 
-    int testWordLength = 0;
+    int testWordLength = 1;
     for(; testWordLength <= inputWordLength; ++testWordLength){
         blockDim.x = testWordLength;
         blockDim.y = 1;
         blockDim.x = 1;
-        gridDim.x  = ceil(MAX_BLOCK_X / testWordLength);
+        gridDim.x  = (int) ceil(MAX_GRID_X / testWordLength);
         gridDim.y  = 1;
         gridDim.z  = 1;
 

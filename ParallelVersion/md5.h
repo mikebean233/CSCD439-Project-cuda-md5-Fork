@@ -5,7 +5,4 @@ __host__ __device__ void md5_vfy(unsigned char* data, uint length, uint *a1, uin
 uint unhex(unsigned char x);
 void md5_to_ints(unsigned char* md5, uint *r0, uint *r1, uint *r2, uint *r3);
 
-
-
-
 #endif //PROJECT_MD5_H
