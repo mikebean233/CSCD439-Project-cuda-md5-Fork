@@ -112,7 +112,7 @@ int main( int argc, char** argv)
 	if(verboseMode)
 		printf("Time Cost: ");
 
-	printf("%f", timeCost);
+	printf("%f\n", timeCost);
 	return 0;
 }
 
@@ -220,6 +220,7 @@ void performParallelSearch(unsigned char* word, unsigned char* charSet, uint wor
 
 		if(cpuCorrectPass[0] != 0)
 		{
+			printf("found");
 			if(verbose){
 				printf("\n\nFOUND: ");
 				int k = 0;
