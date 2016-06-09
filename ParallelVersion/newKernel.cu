@@ -51,7 +51,7 @@ int main(int argc, char** argv){
     // Host
     unsigned char *h_charMap, *h_out;
     //uint h_wordLength, h_batchSize, h_charSetLength;
-    uint *h_v;
+    uint *h_v[4] = {0,0,0,0};
     int inputWordLength;
     int charMapLength;
 
