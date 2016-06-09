@@ -8,7 +8,6 @@
  *   Max dimension size of a grid size    (x,y,z): (2147483647, 65535, 65535)
  *
  */
-
 #define MAX_GRID_X 2147483647
 #define MAX_GRID_Y 65535
 #define MAX_GRID_z 65535
@@ -16,17 +15,17 @@
 #define MAX_BLOCK_X 1024
 #define MAX_BLOCK_Y 1024
 #define MAX_BLOCK_Z 64
-
-__global__ void crack(uint wordLength, uint beginnigOffset, long long batchSize, char* out, char* charMap, uint charSetLength, uint v1, uint v2, uint v3, uint v4){
-    blockIdx = gridDim.c * blockIdx.y + blockIdx.x;
+__host__ __device__ void md5_vfy(unsigned char* data, uint length, uint *a1, uint *b1, uint *c1, uint *d1);
+__global__ void crack(uint wordLength, uint beginnigOffset, long long batchSize, unsigned char *out, unsigned char *charMap, uint charSetLength, uint v1, uint v2, uint v3, uint v4){
+    long long permutationNo = gridDim.x * blockIdx.y + blockIdx.x;
 
     extern __shared__ unsigned char thisWord[];
-    if(blockIdx > batchSize)
+    if(permutationNo > batchSize)
         return;
 
-    blockIdx += beginningOffset;
+    permutationNo += beginningOffset;
 
-    int thisValue = blockIdx % (charSetLength * (threadIdx.x + 1) + 1);
+    int thisValue = permutationNo % (charSetLength * (threadIdx.x + 1) + 1);
     thisWord[threadIdx.x] = charMap[thisValue];
     int c1,c2,c3,c4;
     md5_vfy(thisWord, wordLength, &c1, &c2, &c3, &c4);
@@ -43,7 +42,7 @@ int main(int argc, char** argv){
 
     // Host
     unsigned char *h_charMap, *h_out;
-    uint h_wordLength, h_beginnigOffset, h_batchSize, h_charSetLength, v1, v2, v3, v4;
+    uint h_wordLength, h_batchSize, h_charSetLength, v1, v2, v3, v4;
     int inputWordLength;
     int charMapLength;
 
@@ -66,15 +65,15 @@ int main(int argc, char** argv){
 
     // Allocate cpu memory
     char* staticCharSet = "abcdefghijklmnopqrstuvwxyz";
-    charMapLength = strlen(staticCharSet);
+    charMapLength = strlen((char*)staticCharSet);
     h_charMap = (unsigned char*) calloc(charMapLength,   sizeof(unsigned char));
     h_out     = (unsigned char*) calloc(inputWordLength, sizeof(unsigned char));
-    strcpy(h_charMap, staticCharSet);
+    strcpy(h_charMap, (char*) staticCharSet);
 
 
     // Allocate and initialize Gpu memory
-    cudaMalloc((void **) &d_charMap, sizeof(unsigned char) * strlen(h_charMap));
-    cudaMalloc((void **) &d_out,     sizeof(unsigned char) * strlen(inputWord));
+    cudaMalloc((void **) &d_charMap, sizeof(unsigned char) * charMapLength);
+    cudaMalloc((void **) &d_out,     sizeof(unsigned char) * inputWordLength);
     cudaMemcpy(d_charMap, h_charMap, charMapLength * sizeof(unsigned char), cudaMemcpyHostToDevice);
 
 
@@ -88,10 +87,13 @@ int main(int argc, char** argv){
 
     int testWordLength = 0;
     for(; testWordLength <= inputWordLength; ++testWordLength){
-        blockDim = {testWordLength, 1, 1};
-        gridDim  = {Math.ceil(MAX_BLOCK_X / testWordLength),1,1};
+        blockDim.x = testWordLength;
+        blockDim.y = 1;
+        blockDim.x = 1;
+        gridDim.x  = Math.ceil(MAX_BLOCK_X / testWordLength);
+        gridDim.y  = 1;
+        gridDim.z  = 1;
 
-                                                // crack(uint wordLength, uint beginnigOffset, uint batchSize, char* out, char* charMap, uint charSetLength, uint v1, uint v2, uint v3, uint v4){
         crack <<< gridDim, blockDim, testWordLength >>> (testWordLength, 0, noPermutations, d_out, d_charMap, charMapLength, v1, v2, v3, v4);
         cudaMemcpy(h_out, d_out, testWordLength, cudaMemcpyDeviceToHost);
         if(h_out[0] != '\0'){
