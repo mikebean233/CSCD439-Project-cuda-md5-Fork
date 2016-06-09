@@ -30,6 +30,8 @@ __global__ void crack(uint wordLength, uint beginningOffset, long long batchSize
     int thisValue = permutationNo % (charSetLength * (threadIdx.x + 1) + 1);
     thisWord[threadIdx.x] = charMap[thisValue];
     uint c1,c2,c3,c4;
+    printf("%s\n", thisWord);
+
     md5_vfy(thisWord, wordLength, &c1, &c2, &c3, &c4);
     if(c1 == v1 && c2 == v2 && c3 == v3 && c4 == v4 ){
         out[threadIdx.x] = thisWord[threadIdx.x];
@@ -92,7 +94,7 @@ int main(int argc, char** argv){
         blockDim.x = testWordLength;
         blockDim.y = 1;
         blockDim.x = 1;
-        gridDim.x  = (int) ceil(MAX_GRID_X / testWordLength);
+        gridDim.x  = (int) noPermutations;//ceil(MAX_GRID_X / testWordLength);
         gridDim.y  = 1;
         gridDim.z  = 1;
 
