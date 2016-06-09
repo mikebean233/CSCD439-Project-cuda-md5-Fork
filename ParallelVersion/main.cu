@@ -23,7 +23,7 @@ __device__ unsigned char correctPass[MAX_TOTAL];
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
-#include "time.h"
+#include "timeing.h"
 
 #include "md5.cu" //This contains our MD5 helper functions
 #include "md5kernel.cu" //the CUDA thread
@@ -173,7 +173,7 @@ int main( int argc, char** argv) {
 	bool finished = false;
 	int ct = 0;
 
-	cudaEventRecord(launch_begin, 0);
+	//cudaEventRecord(launch_begin, 0);
 
 	do {
 		cudaMemcpyToSymbol(cudaBrute, &currentBrute, MAX_BRUTE_LENGTH, 0, cudaMemcpyHostToDevice);
