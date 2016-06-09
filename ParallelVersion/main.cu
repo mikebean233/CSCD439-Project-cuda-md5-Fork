@@ -23,6 +23,8 @@ __device__ unsigned char correctPass[MAX_TOTAL];
 void usage(char* programName);
 void performSerialSearch(char* word, char* charset, int wordLength, int charSetLength, int v1, int v2, int v3, int v4, int verbose);
 void performParallelSearch(char* word, char* charset, int wordLength, int charSetLength, int v1, int v2, int v3, int v4, int verbose);
+long longPow(int base, int exponent);
+int  intPow(int base, int exponent);
 
 #include <stdio.h>
 #include <time.h>
@@ -66,13 +68,13 @@ int main( int argc, char** argv)
 		if(strcmp("-s", argv[2]) == 0)
 			performSerial = 1;
 		else
-			usage();
+			usage(argv[0]);
 
 	if(argc > 3)
 		if(strcmp("-v", argv[3]) == 0)
 			verboseMode = 1;
 		else
-			usage();
+			usage(argv[0]);
 
 	char* inputString = (char*) malloc(sizeof(char) * strlen(argv[1]));
 	strcpy(inputString, argv[1]);
@@ -100,15 +102,15 @@ int main( int argc, char** argv)
 	long timeBefore = clock();
 
 	if(performSerial)
-		performSerialSearch(inputString, wordLength, charSetLen, v1, v2, v3, v4, verboseMode);
+		performSerialSearch(inputString, charSet, wordLength, charSetLen, v1, v2, v3, v4, verboseMode);
 	else
-		performParallelSearch(intputString, wordLength, charSetLen, v1, v2, v3, v4, verboseMode);
+		performParallelSearch(inputString, charSet, wordLength, charSetLen, v1, v2, v3, v4, verboseMode);
 
 	long timeAfter = clock();
 
 	float timeCost = (timeBefore - timeAfter )/1000000.0;
 
-	if(verbose)
+	if(verboseMode)
 		printf("Time Cost: ");
 
 	printf("%f", timeCost);
@@ -116,19 +118,20 @@ int main( int argc, char** argv)
 }
 
 
-void performSerialSearch(char* word, char* charset, int wordLength, int charSetLength, int v1, int v2, int v3, int v4, int verbose){
+void performSerialSearch(char* word, char* charset, int wordLength, int charSetLength, uint v1, uint v2, uint v3, uint v4, int verbose){
 	long noCombinations = longPow(charSetLength, wordLength);
 	long combinationNo, combinationsThisRound;
 	int digitNo, charIdx, thisGuessLength, thisDigitValue;
-	int guessV1, guessV2, guessV3, guessV4;
+	uint guessV1, guessV2, guessV3, guessV4;
 
 	char* wordGuess = (char*) calloc(sizeof(char), wordLength);
-	if(wordGuess == null){
-		fprintf(stderr, "Error: Unable to allocate memory to store the guessed word\n");
+	long* powCash = (long*) calloc(sizeof(long), wordLength);
+	if(wordGuess == NULL || powCash == NULL){
+		fprintf(stderr, "Error: Unable to allocate host memory on the heap\n");
 		exit(2);
 	}
 
-	long* powCash = (long*) calloc(sizeof(long), wordLength);
+
 
 	// Build our pow cash
 	int digitNo = 0;
@@ -155,9 +158,9 @@ void performSerialSearch(char* word, char* charset, int wordLength, int charSetL
 		}
 	}
 
-	if(powCash != null)
+	if(powCash != NULL)
 		free(powCash);
-	if(wordGuess != null)
+	if(wordGuess != NULL)
 		free(wordGuess);
 }
 
