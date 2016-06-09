@@ -66,7 +66,7 @@ int main( int argc, char** argv)
 	int verboseMode = 0;
 	int paramIdx = 0;
 
-	for(; paramIdx < argc; ++i){
+	for(; paramIdx < argc; ++paramIdx){
 		if(strcmp(argv[paramIdx], "-v") == 0)
 			verboseMode = 1;
 		if(strcmp(argv[paramIdx], "-s") == 0)
