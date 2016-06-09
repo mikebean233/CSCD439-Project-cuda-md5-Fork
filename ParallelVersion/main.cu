@@ -100,16 +100,10 @@ int main( int argc, char** argv)
 
 
 
-	int numThreads = BLOCKS * THREADS_PER_BLOCK;
-	unsigned char currentBrute[MAX_BRUTE_LENGTH];
-	unsigned char cpuCorrectPass[MAX_TOTAL];
-
-	ZeroFill(currentBrute, MAX_BRUTE_LENGTH);
-	ZeroFill(cpuCorrectPass, MAX_TOTAL);
 
 
 	//zero the container used to hold the correct pass
-	cudaMemcpyToSymbol(correctPass, &cpuCorrectPass, MAX_TOTAL, 0, cudaMemcpyHostToDevice);
+	//cudaMemcpyToSymbol(correctPass, &cpuCorrectPass, MAX_TOTAL, 0, cudaMemcpyHostToDevice);
 
 	//create and copy the charset to device
 	cudaMemcpyToSymbol(cudaCharSet, &charSet, charSetLen, 0, cudaMemcpyHostToDevice);
@@ -205,6 +199,14 @@ int intPow(int base, int exponent){
 void performParallelSearch(unsigned char* word, unsigned char* charSet, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose){
 	if(verbose)
 		printf("---------- Parallel Version ---------------\n");
+
+	int numThreads = BLOCKS * THREADS_PER_BLOCK;
+	unsigned char currentBrute[MAX_BRUTE_LENGTH];
+	unsigned char cpuCorrectPass[MAX_TOTAL];
+
+	ZeroFill(currentBrute, MAX_BRUTE_LENGTH);
+	ZeroFill(cpuCorrectPass, MAX_TOTAL);
+
 
 
 	cudaEvent_t launch_begin, launch_end;
