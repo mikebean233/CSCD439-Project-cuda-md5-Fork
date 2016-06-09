@@ -11,9 +11,9 @@
 #define MAX_TOTAL MAX_BRUTE_LENGTH
 
 //Performance:
-#define BLOCKS 128
-#define THREADS_PER_BLOCK 512
-#define MD5_PER_KERNEL 600
+#define BLOCKS 512
+#define THREADS_PER_BLOCK 1024
+#define MD5_PER_KERNEL 200
 #define OUTPUT_INTERVAL 20
 
 __device__ __constant__ unsigned char cudaBrute[MAX_BRUTE_LENGTH];
