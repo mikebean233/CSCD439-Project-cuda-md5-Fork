@@ -18,7 +18,9 @@
 #define MAX_BLOCK_Y 1024
 #define MAX_BLOCK_Z 64
 
-__global__ void crack(uint wordLength, uint beginningOffset, long long batchSize, unsigned char *out, unsigned char *charMap, uint charSetLength, uint v1, uint v2, uint v3, uint v4){
+#define MAX_BATCH_SIZE 16000000
+
+__global__ void crack(uint wordLength, long beginningOffset, long batchSize, unsigned char *out, unsigned char *charMap, uint charSetLength, uint v1, uint v2, uint v3, uint v4){
     long long permutationNo = gridDim.x * blockIdx.y + blockIdx.x;
 
     extern __shared__ unsigned char thisWord[];
@@ -90,24 +92,30 @@ int main(int argc, char** argv){
         noPermutations *= charMapLength;
     }
 
+
+    long noBatches = ceil(noPermutations / batchSize);
+
+
 //    blockDim.x = testWordLength;
     blockDim.y = 1;
     blockDim.z = 1;
     gridDim.x  = min(noPermutations, (long long)MAX_GRID_Y) ;//(int) noPermutations;//ceil(MAX_GRID_X / testWordLength);
-    gridDim.y  = ceil(noPermutations / gridDim.x);
+    gridDim.y  = ceil(min(MAX_BATCH_SIZE, noPermutations) / gridDim.x);
     gridDim.z  = 1;
 
     printf("Input Word: %s\nInput Word Length: %d\nCharacter Set:\"%s\"\nPossible Permutations: %d\n", inputWord, inputWordLength, h_charMap, noPermutations);
     int testWordLength = 1;
-    for(; testWordLength <= inputWordLength; ++testWordLength){
+    for(; testWordLength <= inputWordLength; ++testWordLength) {
         blockDim.x = testWordLength;
-        crack <<< gridDim, blockDim, testWordLength >>> (testWordLength, 0, noPermutations, d_out, d_charMap, charMapLength, v1, v2, v3, v4);
-        cudaMemcpy(h_out, d_out, testWordLength, cudaMemcpyDeviceToHost);
-        if(h_out[0] != '\0'){
-            printf("Found match: %s\n", h_out);
-            break;
+        long batchNumber = 0;
+        for (; batchNumber < noBatches; ++batchNumber) { }
+            crack <<< gridDim, blockDim, testWordLength >>> (testWordLength, batchNumber * batchSize, batchSize, d_out, d_charMap, charMapLength, v1, v2, v3, v4);
+            cudaMemcpy(h_out, d_out, testWordLength, cudaMemcpyDeviceToHost);
+            if (h_out[0] != '\0') {
+                printf("Found match: %s\n", h_out);
+                break;
+            }
         }
-
     }
     if(h_out[0] == '\0')
         printf("No match was found :(\n");
