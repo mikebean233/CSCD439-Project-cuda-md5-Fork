@@ -17,7 +17,7 @@
 #define MAX_BLOCK_X 1024
 #define MAX_BLOCK_Y 1024
 #define MAX_BLOCK_Z 64
-__host__ __device__ void md5_vfy(unsigned char* data, uint length, uint *a1, uint *b1, uint *c1, uint *d1);
+
 __global__ void crack(uint wordLength, uint beginningOffset, long long batchSize, unsigned char *out, unsigned char *charMap, uint charSetLength, uint v1, uint v2, uint v3, uint v4){
     long long permutationNo = gridDim.x * blockIdx.y + blockIdx.x;
 
