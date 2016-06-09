@@ -34,7 +34,7 @@ __global__ void crack(uint wordLength, uint beginningOffset, long long batchSize
     int thisValue = permutationNo % (charSetLength * (threadIdx.x + 1) + 1);
     thisWord[threadIdx.x] = charMap[thisValue];
     uint c1, c2, c3, c4;
-    if (permutationNo == 0) { }
+    if (permutationNo == 0){
         printf("charMap: %s\n", charMap);
         printf("v0:%d  v1:%d  v2:%d v3:%d  ", v[0], v[1], v[2], v[3]);
         //printf("%s\n", thisWord);
@@ -87,7 +87,7 @@ int main(int argc, char** argv){
     // Allocate and initialize Gpu memory
     cudaMalloc((void **) &d_charMap, sizeof(unsigned char) * charMapLength);
     //cudaMalloc((void **) &d_out,     sizeof(unsigned char) * inputWordLength);
-    cudaMemcpyToSymbol(charMap, h_charMap, charMapLength * sizeof(unsigned char), cudaMemcpyHostToDevice);
+    cudaMemcpyToSymbol((void **)&charMap, h_charMap, charMapLength * sizeof(unsigned char), cudaMemcpyHostToDevice);
     cudaMemcpyToSymbol(v, h_v, 4 * sizeof(uint), cudaMemcpyHostToDevice);
 
 
