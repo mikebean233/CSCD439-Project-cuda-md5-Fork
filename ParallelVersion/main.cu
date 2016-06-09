@@ -76,8 +76,8 @@ int main( int argc, char** argv)
 		else
 			usage(argv[0]);
 
-	unsigned char* inputString = (unsigned char*) malloc(sizeof(unsigned char) * strlen(argv[1]));
-	strcpy(inputString, argv[1]);
+	unsigned char* inputString = (unsigned char*) malloc(sizeof(unsigned char) * wordLength + 1);
+	strcpy((char*)inputString, argv[1]);
 	uint v1,v2,v3,v4;
 
 	// Generate our character set
@@ -86,7 +86,7 @@ int main( int argc, char** argv)
 	memcpy(charSet, "abcdefghijklmnopqrstuvwxyz", charSetLen);
 
 	// Generate the MD5 hash for the input data
-	md5_vfy((unsigned char*)inputString, strlen(inputString), &v1, &v2, &v3, &v4);
+	md5_vfy((unsigned char*)inputString, wordLength, &v1, &v2, &v3, &v4);
 	printf("hash for %s: %#x%x%x%x\n", inputString, v1,v2,v3,v4);
 
 	// Crack the input hash
@@ -135,7 +135,7 @@ void performSerialSearch(unsigned char* word, unsigned char* charset, int wordLe
 	}
 
 	// Build our pow cash
-	for (digitNo = 0; digitNo < wordLength; ++i) {
+	for (digitNo = 0; digitNo < wordLength; ++digitNo) {
 		powCash[digitNo] = longPow(charSetLength, digitNo);
 	}
 
