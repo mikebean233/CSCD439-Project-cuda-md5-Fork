@@ -32,7 +32,7 @@ __global__ void crack(uint numThreads, uint charSetLen, uint bruteLength, uint v
 	i = 0;
 	bruteStart = 0;
 	i+= bruteLength;
-	otalLen = bruteLength;
+	totalLen = bruteLength;
 
 	IncrementBruteGPU(ourBrute, charSetLen, bruteLength, idx);
 	int timer = 0;
