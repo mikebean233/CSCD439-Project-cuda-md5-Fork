@@ -21,8 +21,8 @@ __device__ __constant__ unsigned char cudaBrute[MAX_BRUTE_LENGTH];
 __device__ __constant__ unsigned char cudaCharSet[95];
 __device__ unsigned char correctPass[MAX_TOTAL];
 void usage(char* programName);
-void performSerialSearch(char* word, char* charset, int wordLength, int charSetLength, int v1, int v2, int v3, int v4, int verbose);
-void performParallelSearch(char* word, char* charset, int wordLength, int charSetLength, int v1, int v2, int v3, int v4, int verbose);
+void performSerialSearch(unsigned char* word, unsigned char* charset, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose);
+void performParallelSearch(unsigned char* word, unsigned char* charset, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose);
 long longPow(int base, int exponent);
 int  intPow(int base, int exponent);
 
@@ -118,7 +118,7 @@ int main( int argc, char** argv)
 }
 
 
-void performSerialSearch(char* word, char* charset, int wordLength, int charSetLength, uint v1, uint v2, uint v3, uint v4, int verbose){
+void performSerialSearch(unsigned char* word, unsigned char* charset, int wordLength, int charSetLength, uint v1, uint v2, uint v3, uint v4, int verbose){
 	long noCombinations = longPow(charSetLength, wordLength);
 	long combinationNo, combinationsThisRound;
 	int digitNo, charIdx, thisGuessLength, thisDigitValue;
@@ -145,11 +145,11 @@ void performSerialSearch(char* word, char* charset, int wordLength, int charSetL
 		combinationsThisRound = longPow(charSetLength, thisGuessLength);
 		combinationNo = 0;
 		for (; combinationNo < combinationsThisRound; ++combinationNo) {
-			for (digitNo = 0; digitNo < thisGuessLength) {
-				thisDigitValue = (combinationNo / powCash[digitNo]) % base;
+			for (digitNo = 0; digitNo < thisGuessLength; ++digitNo) {
+				thisDigitValue = (combinationNo / powCash[digitNo]) % charSetLength;
 				wordGuess[digitNo] = charSet[thisDigitValue];
 			}
-			md5_vfy(wordGuess, thisGuessLength, &guessV1, &guessV1, &guessV2, &guessV3, &guessV4);
+			md5_vfy(wordGuess, thisGuessLength, &guessV1, &guessV2, &guessV3, &guessV4);
 			if(guessV1 == v1 && guessV2 == v2 && guessV3 == v3 && guessV4 == v4){
 				if(verbose)
 					printf("FOUND: %s", wordGuess);
@@ -187,7 +187,7 @@ int intPow(int base, int exponent){
 }
 
 
-void performParallelSearch(char* word, char* charset, int wordLength, int charSetLength, int v1, int v2, int v3, int v4, int verbose){
+void performParallelSearch(unsigned char* word, unsigned char* charset, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose){
 	//cudaEvent_t launch_begin, launch_end;
 	//cudaEventCreate(&launch_begin);
 	//cudaEventCreate(&launch_end);
@@ -203,7 +203,7 @@ void performParallelSearch(char* word, char* charset, int wordLength, int charSe
 	cudaMemcpyToSymbol(correctPass, &cpuCorrectPass, MAX_TOTAL, 0, cudaMemcpyHostToDevice);
 
 	//create and copy the charset to device
-	cudaMemcpyToSymbol(cudaCharSet, &charSet, charSetLen, 0, cudaMemcpyHostToDevice);
+	cudaMemcpyToSymbol(cudaCharSet, &charSet, charSetLength, 0, cudaMemcpyHostToDevice);
 
 	bool finished = false;
 	int ct = 0;
@@ -242,7 +242,7 @@ void performParallelSearch(char* word, char* charset, int wordLength, int charSe
 			//if(verbose)
 			//	printf("done! GPU time cost in seconds: ");
 			//printf("%f\n", time / 1000);
-			return 0;
+			return;
 		}
 
 		finished = BruteIncrement(currentBrute, charSetLen, wordLength, numThreads * MD5_PER_KERNEL);
