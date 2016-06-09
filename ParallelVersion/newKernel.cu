@@ -50,7 +50,7 @@ int main(int argc, char** argv){
 
     // Host
     unsigned char *h_charMap, *h_out;
-    uint h_wordLength, h_batchSize, h_charSetLength;
+    //uint h_wordLength, h_batchSize, h_charSetLength;
     uint *h_v;
     int inputWordLength;
     int charMapLength;
@@ -104,7 +104,7 @@ int main(int argc, char** argv){
         gridDim.y  = 1;
         gridDim.z  = 1;
 
-        crack <<< gridDim, blockDim, testWordLength >>> (testWordLength, 0, noPermutations, d_out, d_charMap, charMapLength);
+        crack <<< gridDim, blockDim, testWordLength >>> (testWordLength, 0, noPermutations, d_out, charMapLength);
         cudaMemcpy(h_out, d_out, testWordLength, cudaMemcpyDeviceToHost);
         if(h_out[0] != '\0'){
             printf("Found match: %s\n", h_out);
