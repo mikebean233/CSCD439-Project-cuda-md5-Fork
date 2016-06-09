@@ -106,7 +106,7 @@ int main( int argc, char** argv)
 	//cudaMemcpyToSymbol(correctPass, &cpuCorrectPass, MAX_TOTAL, 0, cudaMemcpyHostToDevice);
 
 	//create and copy the charset to device
-	cudaMemcpyToSymbol(cudaCharSet, &charSet, charSetLen, 0, cudaMemcpyHostToDevice);
+	//cudaMemcpyToSymbol(cudaCharSet, &charSet, charSetLen, 0, cudaMemcpyHostToDevice);
 
 
 	// perform the search
@@ -226,6 +226,8 @@ void performParallelSearch(unsigned char* word, unsigned char* charSet, uint wor
 	//create and copy the charset to device
 	cudaMemcpyToSymbol(cudaCharSet, &charSet, charSetLength, 0, cudaMemcpyHostToDevice);
 */
+	cudaMemcpyToSymbol(cudaCharSet, &charSet, charSetLen, 0, cudaMemcpyHostToDevice);
+
 	bool finished = false;
 	int ct = 0;
 
