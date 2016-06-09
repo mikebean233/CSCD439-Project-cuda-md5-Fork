@@ -96,7 +96,7 @@ int main(int argc, char** argv){
     }
 
     batchSize = max(noPermutations, (long long ) MAX_BATCH_SIZE);
-    noBatches = max(ceil(noPermutations / batchSize), 1);
+    noBatches = max((int)ceil(noPermutations / batchSize), 1);
 
 
 //    blockDim.x = testWordLength;
