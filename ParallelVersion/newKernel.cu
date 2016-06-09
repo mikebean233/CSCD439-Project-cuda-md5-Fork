@@ -31,6 +31,7 @@ __global__ void crack(uint wordLength, uint beginningOffset, long long batchSize
     thisWord[threadIdx.x] = charMap[thisValue];
     uint c1,c2,c3,c4;
     md5_vfy(thisWord, wordLength, &c1, &c2, &c3, &c4);
+
     if(c1 == v1 && c2 == v2 && c3 == v3 && c4 == v4 ){
         out[threadIdx.x] = thisWord[threadIdx.x];
     }
@@ -39,6 +40,7 @@ __global__ void crack(uint wordLength, uint beginningOffset, long long batchSize
 void usage(char* programName);
 
 int main(int argc, char** argv){
+    cudaDeviceReset();
     // Device
     unsigned char *d_charMap, *d_out;
 
@@ -76,6 +78,8 @@ int main(int argc, char** argv){
     // Allocate and initialize Gpu memory
     cudaMalloc((void **) &d_charMap, sizeof(unsigned char) * charMapLength);
     cudaMalloc((void **) &d_out,     sizeof(unsigned char) * inputWordLength);
+    cudaMemset (charMap,0,sizeof(unsigned char) * charMapLength);
+    cudaMemset (d_out,0,sizeof(unsigned char) * inputWordLength);
     cudaMemcpy(d_charMap, h_charMap, charMapLength * sizeof(unsigned char), cudaMemcpyHostToDevice);
 
 
