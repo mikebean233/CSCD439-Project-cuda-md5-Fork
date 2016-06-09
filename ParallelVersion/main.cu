@@ -164,10 +164,10 @@ int main( int argc, char** argv)
 
 void checkCUDAError(const char *msg)
 {
-    cudaError_t err = cudaGetLastError();
-    if( cudaSuccess != err) 
-    {
-        fprintf(stderr, "Cuda error: %s: %s.\n", msg, cudaGetErrorString( err) );
-        exit(-1);
-    }                         
+	cudaError_t err = cudaGetLastError();
+	if( cudaSuccess != err)
+	{
+		fprintf(stderr, "Cuda error: %s: %s.\n", msg, cudaGetErrorString( err) );
+		exit(-1);
+	}
 }

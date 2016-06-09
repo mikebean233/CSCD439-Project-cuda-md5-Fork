@@ -5,7 +5,7 @@ newKernel: newKernel.cu md5.o
 	nvcc -arch=sm_32 -o newKernel newKernel.cu md5.o -lm
 
 md5.o: md5.cu
-    nvcc -arch=sm_32 -c -o md5.o md5.cu
+	nvcc -arch=sm_32 -c -o md5.o md5.cu
 
 clean:
 	rm *.o
