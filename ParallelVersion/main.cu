@@ -30,8 +30,8 @@ __device__ unsigned char correctPass[MAX_TOTAL];
 
 void checkCUDAError(const char *msg);
 void usage(char* programName);
-void performSerialSearch(unsigned char* word, unsigned char* charset, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose);
-void performParallelSearch(unsigned char* word, unsigned char* charset, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose);
+void performSerialSearch(unsigned char* word, unsigned char* charSet, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose);
+void performParallelSearch(unsigned char* word, unsigned char* charSet, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose);
 long longPow(int base, int exponent);
 int  intPow(int base, int exponent);
 
@@ -121,13 +121,13 @@ int main( int argc, char** argv)
 }
 
 
-void performSerialSearch(unsigned char* word, unsigned char* charset, int wordLength, int charSetLength, uint v1, uint v2, uint v3, uint v4, int verbose){
+void performSerialSearch(unsigned char* word, unsigned char* charSet, int wordLength, int charSetLength, uint v1, uint v2, uint v3, uint v4, int verbose){
 	long noCombinations = longPow(charSetLength, wordLength);
 	long combinationNo, combinationsThisRound;
 	int digitNo, charIdx, thisGuessLength, thisDigitValue;
 	uint guessV1, guessV2, guessV3, guessV4;
 
-	char* wordGuess = (char*) calloc(sizeof(char), wordLength);
+	unsigned char* wordGuess = (unsigned char*) calloc(sizeof(unsigned char), wordLength);
 	long* powCash = (long*) calloc(sizeof(long), wordLength);
 	if(wordGuess == NULL || powCash == NULL){
 		fprintf(stderr, "Error: Unable to allocate host memory on the heap\n");
@@ -187,7 +187,7 @@ int intPow(int base, int exponent){
 }
 
 
-void performParallelSearch(unsigned char* word, unsigned char* charset, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose){
+void performParallelSearch(unsigned char* word, unsigned char* charSet, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose){
 	//cudaEvent_t launch_begin, launch_end;
 	//cudaEventCreate(&launch_begin);
 	//cudaEventCreate(&launch_end);
@@ -217,7 +217,7 @@ void performParallelSearch(unsigned char* word, unsigned char* charset, uint wor
 		dim3 dimGrid(BLOCKS);
 		dim3 dimBlock(THREADS_PER_BLOCK);
 
-		crack<<<dimGrid, dimBlock>>>(numThreads, charSetLen, wordLength, v1,v2,v3,v4);
+		crack<<<dimGrid, dimBlock>>>(numThreads, charSetLength, wordLength, v1,v2,v3,v4);
 
 		//get the "correct pass" and see if there really is one
 		cudaMemcpyFromSymbol(&cpuCorrectPass, correctPass, MAX_TOTAL, 0, cudaMemcpyDeviceToHost);
