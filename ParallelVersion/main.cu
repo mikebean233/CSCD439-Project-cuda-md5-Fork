@@ -95,7 +95,7 @@ int main( int argc, char** argv) {
 		printf(" brute force md5 password hash cracking...\n");
 	}
 
-	long timeBefore = currentTime();
+	double timeBefore = currentTime();
 	if (performSerial) {
 		// ---------------------- CPU VERSION -----------------------------------
 
@@ -232,14 +232,14 @@ int main( int argc, char** argv) {
 	exit:
 
 	// capture the end time
-	long timeAfter = currentTime();
+	double timeAfter = currentTime();
 
-	float timeCost = (timeAfter - timeBefore) / 1000000.0;
+	double timeCost = (timeAfter - timeBefore);
 
 	if (verboseMode)
 		printf("Time Cost: ");
 
-	printf("%f\n", timeCost);
+	printf("%lf\n", timeCost);
 
 	return 0;
 }
