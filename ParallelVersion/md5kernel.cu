@@ -28,7 +28,7 @@ __global__ void crack(uint numThreads, uint charSetLen, uint bruteLength, uint v
 	{
 		ourBrute[i] = cudaBrute[i];
 	}
-	printf("charSet: %s\n", cudaCharSet);
+	printf("charBrute: %s\n", cudaBrute);
 
 	i = 0;
 	bruteStart = 0;
