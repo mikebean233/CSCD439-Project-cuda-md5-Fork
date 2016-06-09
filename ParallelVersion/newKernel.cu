@@ -30,8 +30,6 @@ __global__ void crack(uint wordLength, uint beginningOffset, long long batchSize
     int thisValue = permutationNo % (charSetLength * (threadIdx.x + 1) + 1);
     thisWord[threadIdx.x] = charMap[thisValue];
     uint c1,c2,c3,c4;
-    printf("%s\n", thisWord);
-    printf("permutationnNo: %ll   blockIdx.x: %d  threadIdx.x: %d\n", permutationNo, blockIdx.x, threadIdx.x);
     md5_vfy(thisWord, wordLength, &c1, &c2, &c3, &c4);
     if(c1 == v1 && c2 == v2 && c3 == v3 && c4 == v4 ){
         out[threadIdx.x] = thisWord[threadIdx.x];
@@ -88,7 +86,7 @@ int main(int argc, char** argv){
         noPermutations *= charMapLength;
     }
 
-    printf("Input Word: %s\nInput Word Length: %d\nCharacter Set:\"%s\"\nPossible Permutations: $lld\n", inputWord, inputWordLength, h_charMap, noPermutations);
+    printf("Input Word: %s\nInput Word Length: %d\nCharacter Set:\"%s\"\nPossible Permutations: %d\n", inputWord, inputWordLength, h_charMap, noPermutations);
     int testWordLength = 1;
     for(; testWordLength <= inputWordLength; ++testWordLength){
         blockDim.x = testWordLength;
