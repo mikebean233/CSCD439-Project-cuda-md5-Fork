@@ -21,21 +21,25 @@
 __constant__ int v[4];
 __constant__ unsigned char charMap[26];
 
-__global__ void crack(uint wordLength, uint beginningOffset, long long batchSize, unsigned char *out, uint charSetLength){
+__global__ void crack(uint wordLength, uint beginningOffset, long long batchSize, unsigned char *out, uint charSetLength) {
     long long permutationNo = gridDim.x * blockIdx.y + blockIdx.x;
 
     extern __shared__ unsigned char thisWord[];
 
-    if(permutationNo > batchSize)
+    if (permutationNo > batchSize)
         return;
 
     permutationNo += beginningOffset;
 
     int thisValue = permutationNo % (charSetLength * (threadIdx.x + 1) + 1);
     thisWord[threadIdx.x] = charMap[thisValue];
-    uint c1,c2,c3,c4;
-    //printf("%s\n", thisWord);
-    //printf("permutationnNo: %lld   blockIdx.x: %d  threadIdx.x: %d\n", permutationNo, blockIdx.x, threadIdx.x);
+    uint c1, c2, c3, c4;
+    if (permutationNo == 0) { }
+        printf("charMap: %s\n", charMap);
+        printf("v0:%d  v1:%d  v2:%d v3:%d  ", v[0], v[1], v[2], v[3]);
+        //printf("%s\n", thisWord);
+        //printf("permutationnNo: %lld   blockIdx.x: %d  threadIdx.x: %d\n", permutationNo, blockIdx.x, threadIdx.x);
+    }
     md5_vfy(thisWord, wordLength, &c1, &c2, &c3, &c4);
     if(c1 == v[0] && c2 == v[1] && c3 == v[2] && c4 == v[3] ){
         out[threadIdx.x] = thisWord[threadIdx.x];
