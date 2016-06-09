@@ -76,7 +76,7 @@ int main( int argc, char** argv)
 		else
 			usage(argv[0]);
 
-	char* inputString = (char*) malloc(sizeof(char) * strlen(argv[1]));
+	unsigned char* inputString = (unsigned char*) malloc(sizeof(unsigned char) * strlen(argv[1]));
 	strcpy(inputString, argv[1]);
 	uint v1,v2,v3,v4;
 
@@ -99,13 +99,16 @@ int main( int argc, char** argv)
 		printf(" brute force md5 password hash cracking...\n");
 	}
 
+	// capture the start time
 	long timeBefore = clock();
 
+	// perform the search
 	if(performSerial)
 		performSerialSearch(inputString, charSet, wordLength, charSetLen, v1, v2, v3, v4, verboseMode);
 	else
 		performParallelSearch(inputString, charSet, wordLength, charSetLen, v1, v2, v3, v4, verboseMode);
 
+	// capture the end time
 	long timeAfter = clock();
 
 	float timeCost = (timeBefore - timeAfter )/1000000.0;
@@ -131,11 +134,8 @@ void performSerialSearch(unsigned char* word, unsigned char* charset, int wordLe
 		exit(2);
 	}
 
-
-
 	// Build our pow cash
-	int digitNo = 0;
-	for (; digitNo < wordLength; ++i) {
+	for (digitNo = 0; digitNo < wordLength; ++i) {
 		powCash[digitNo] = longPow(charSetLength, digitNo);
 	}
 
@@ -269,7 +269,7 @@ void performParallelSearch(unsigned char* word, unsigned char* charset, uint wor
 void usage(char* programName){
 	fprintf(stderr, "usage: %s targetWord [-s][-v]\n", programName);
 	fprintf(stderr, "       -s: perform serial Version (if omitted, the paralell version will be used)\n");
-	fprintf(srderr, "       -v: Be verbose (if omitted only the time cost of the implementation will be printed\n");
+	fprintf(stderr, "       -v: Be verbose (if omitted only the time cost of the implementation will be printed\n");
 	exit(1);
 }
 
