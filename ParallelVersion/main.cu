@@ -56,6 +56,8 @@ bool BruteIncrement(unsigned char* brute, int setLen, int wordLength, int increm
 }
 
 int main( int argc, char** argv) {
+	cudaSetDevice(2);
+
 	// Parse Command line arguments
 	if (argc < 2)
 		usage(argv[0]);
@@ -134,7 +136,7 @@ int main( int argc, char** argv) {
 				if (guessV1 == v1 && guessV2 == v2 && guessV3 == v3 && guessV4 == v4) {
 					if (verboseMode)
 						printf("FOUND: %s\n", wordGuess);
-					fount = 1;
+					found = 1;
 					goto exit;
 				}
 			}
