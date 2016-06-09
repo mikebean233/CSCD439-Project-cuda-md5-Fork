@@ -20,11 +20,6 @@
 __device__ __constant__ unsigned char cudaBrute[MAX_BRUTE_LENGTH];
 __device__ __constant__ unsigned char cudaCharSet[95];
 __device__ unsigned char correctPass[MAX_TOTAL];
-void usage(char* programName);
-void performSerialSearch(unsigned char* word, unsigned char* charset, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose);
-void performParallelSearch(unsigned char* word, unsigned char* charset, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose);
-long longPow(int base, int exponent);
-int  intPow(int base, int exponent);
 
 #include <stdio.h>
 #include <time.h>
@@ -34,6 +29,11 @@ int  intPow(int base, int exponent);
 #include "md5kernel.cu" //the CUDA thread
 
 void checkCUDAError(const char *msg);
+void usage(char* programName);
+void performSerialSearch(unsigned char* word, unsigned char* charset, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose);
+void performParallelSearch(unsigned char* word, unsigned char* charset, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose);
+long longPow(int base, int exponent);
+int  intPow(int base, int exponent);
 
 void ZeroFill(unsigned char* toFill, int length)
 {
@@ -101,23 +101,6 @@ int main( int argc, char** argv)
 
 	// capture the start time
 	long timeBefore = clock();
-
-	int numThreads = BLOCKS * THREADS_PER_BLOCK;
-	unsigned char currentBrute[MAX_BRUTE_LENGTH];
-	unsigned char cpuCorrectPass[MAX_TOTAL];
-
-	ZeroFill(currentBrute, MAX_BRUTE_LENGTH);
-	ZeroFill(cpuCorrectPass, MAX_TOTAL);
-
-	//zero the container used to hold the correct pass
-	cudaMemcpyToSymbol(correctPass, &cpuCorrectPass, MAX_TOTAL, 0, cudaMemcpyHostToDevice);
-
-	//create and copy the charset to device
-	cudaMemcpyToSymbol(cudaCharSet, &charSet, charSetLength, 0, cudaMemcpyHostToDevice);
-
-
-
-
 
 	// perform the search
 	if(performSerial)
@@ -208,7 +191,7 @@ void performParallelSearch(unsigned char* word, unsigned char* charset, uint wor
 	//cudaEvent_t launch_begin, launch_end;
 	//cudaEventCreate(&launch_begin);
 	//cudaEventCreate(&launch_end);
-/*
+
 	int numThreads = BLOCKS * THREADS_PER_BLOCK;
 	unsigned char currentBrute[MAX_BRUTE_LENGTH];
 	unsigned char cpuCorrectPass[MAX_TOTAL];
@@ -221,7 +204,7 @@ void performParallelSearch(unsigned char* word, unsigned char* charset, uint wor
 
 	//create and copy the charset to device
 	cudaMemcpyToSymbol(cudaCharSet, &charSet, charSetLength, 0, cudaMemcpyHostToDevice);
-*/
+
 	bool finished = false;
 	int ct = 0;
 
