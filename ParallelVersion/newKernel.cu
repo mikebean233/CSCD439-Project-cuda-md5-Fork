@@ -93,7 +93,7 @@ int main(int argc, char** argv){
 //    blockDim.x = testWordLength;
     blockDim.y = 1;
     blockDim.z = 1;
-    gridDim.x  = min(noPermutations, MAX_GRID_Y) ;//(int) noPermutations;//ceil(MAX_GRID_X / testWordLength);
+    gridDim.x  = min(noPermutations, (long long)MAX_GRID_Y) ;//(int) noPermutations;//ceil(MAX_GRID_X / testWordLength);
     gridDim.y  = ceil(noPermutations / gridDim.x);
     gridDim.z  = 1;
 
