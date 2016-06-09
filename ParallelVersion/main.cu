@@ -76,9 +76,9 @@ int main( int argc, char** argv) {
 	uint v1, v2, v3, v4;
 
 	// Generate our character set
-	int charSetLen = 26;
+	int charSetLength = 26;
 	unsigned char charSet[charSetLen];
-	memcpy(charSet, "abcdefghijklmnopqrstuvwxyz", charSetLen);
+	memcpy(charSet, "abcdefghijklmnopqrstuvwxyz", charSetLength);
 
 	// Generate the MD5 hash for the input data
 	md5_vfy((unsigned char *) inputString, wordLength, &v1, &v2, &v3, &v4);
@@ -95,11 +95,11 @@ int main( int argc, char** argv) {
 	}
 
 
-	if (peformSerial) {
+	if (performSerial) {
 		// ---------------------- CPU VERSION -----------------------------------
 
 
-		if (verbose)
+		if (verboseMode)
 			printf("---------- Serial Version ---------------");
 		long noCombinations = longPow(charSetLength, wordLength);
 		long combinationNo, combinationsThisRound;
@@ -130,9 +130,9 @@ int main( int argc, char** argv) {
 				}
 				md5_vfy(wordGuess, thisGuessLength, &guessV1, &guessV2, &guessV3, &guessV4);
 				if (guessV1 == v1 && guessV2 == v2 && guessV3 == v3 && guessV4 == v4) {
-					if (verbose)
+					if (verboseMode)
 						printf("FOUND: %s\n", wordGuess);
-					return;
+					goto exit;
 				}
 			}
 		}
@@ -149,7 +149,7 @@ int main( int argc, char** argv) {
 	else {
 	// ---------------------- CUDA VERSION -----------------------------------
 
-	if (verbose)
+	if (verboseMode)
 		printf("---------- Parallel Version ---------------\n");
 
 	int numThreads = BLOCKS * THREADS_PER_BLOCK;
@@ -158,18 +158,10 @@ int main( int argc, char** argv) {
 
 	ZeroFill(currentBrute, MAX_BRUTE_LENGTH);
 	ZeroFill(cpuCorrectPass, MAX_TOTAL);
-
-
+]
 	cudaEvent_t launch_begin, launch_end;
 	cudaEventCreate(&launch_begin);
 	cudaEventCreate(&launch_end);
-
-	int numThreads = BLOCKS * THREADS_PER_BLOCK;
-	unsigned char currentBrute[MAX_BRUTE_LENGTH];
-	unsigned char cpuCorrectPass[MAX_TOTAL];
-
-	ZeroFill(currentBrute, MAX_BRUTE_LENGTH);
-	ZeroFill(cpuCorrectPass, MAX_TOTAL);
 
 	//zero the container used to hold the correct pass
 	cudaMemcpyToSymbol(correctPass, &cpuCorrectPass, MAX_TOTAL, 0, cudaMemcpyHostToDevice);
@@ -195,7 +187,7 @@ int main( int argc, char** argv) {
 		cudaMemcpyFromSymbol(&cpuCorrectPass, correctPass, MAX_TOTAL, 0, cudaMemcpyDeviceToHost);
 
 		if (cpuCorrectPass[0] != 0) {
-			if (verbose) {
+			if (verboseMode) {
 				printf("\n\nFOUND: ");
 				int k = 0;
 				while (cpuCorrectPass[k] != 0) {
@@ -209,17 +201,17 @@ int main( int argc, char** argv) {
 			float time = 0;
 			cudaEventElapsedTime(&time, launch_begin, launch_end);
 
-			//if(verbose)
+			//if(verboseMode)
 			//	printf("done! GPU time cost in seconds: ");
 			//printf("%f\n", time / 1000);
-			return;
+			goto exit;
 		}
 
 		finished = BruteIncrement(currentBrute, charSetLength, wordLength, numThreads * MD5_PER_KERNEL);
 
 		checkCUDAError("general");
 
-		if (ct % OUTPUT_INTERVAL == 0 && verbose) {
+		if (ct % OUTPUT_INTERVAL == 0 && verboseMode) {
 			printf("STATUS: ");
 			int k = 0;
 
@@ -236,6 +228,7 @@ int main( int argc, char** argv) {
 
 	// ---------------------- CUDA VERSION -----------------------------------
 	}
+	exit:
 
 	// capture the end time
 	long timeAfter = clock();
