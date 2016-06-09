@@ -27,16 +27,16 @@ __global__ void crack(uint wordLength, long beginningOffset, long batchSize, uns
     if(permutationNo > batchSize)
         return;
 
-    //permutationNo += beginningOffset;
+    permutationNo += beginningOffset;
 
-    //int thisValue = permutationNo % (charSetLength * (threadIdx.x + 1) + 1);
-    //thisWord[threadIdx.x] = charMap[thisValue];
-    //uint c1,c2,c3,c4;
-    //md5_vfy(thisWord, wordLength, &c1, &c2, &c3, &c4);
+    int thisValue = permutationNo % (charSetLength * (threadIdx.x + 1) + 1);
+    thisWord[threadIdx.x] = charMap[thisValue];
+    uint c1,c2,c3,c4;
+    md5_vfy(thisWord, wordLength, &c1, &c2, &c3, &c4);
 
-    //if(c1 == v1 && c2 == v2 && c3 == v3 && c4 == v4 ){
-    //    out[threadIdx.x] = thisWord[threadIdx.x];
-   // }
+    if(c1 == v1 && c2 == v2 && c3 == v3 && c4 == v4 ){
+        out[threadIdx.x] = thisWord[threadIdx.x];
+    }
 }
 
 void usage(char* programName);
