@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "md5.cu"
+#include "md5.h"
 /*
  *   Maximum number of threads per multiprocessor:  2048
  *   Maximum number of threads per block:           1024
