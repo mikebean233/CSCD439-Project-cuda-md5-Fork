@@ -100,7 +100,7 @@ int main(int argc, char** argv){
     blockDim.y = 1;
     blockDim.z = 1;
     gridDim.x  = min(noPermutations, (long long)MAX_GRID_Y) ;//(int) noPermutations;//ceil(MAX_GRID_X / testWordLength);
-    gridDim.y  = ceil(min(MAX_BATCH_SIZE, noPermutations) / gridDim.x);
+    gridDim.y  = ceil(min((long)MAX_BATCH_SIZE, noPermutations) / gridDim.x);
     gridDim.z  = 1;
 
     printf("Input Word: %s\nInput Word Length: %d\nCharacter Set:\"%s\"\nPossible Permutations: %d\n", inputWord, inputWordLength, h_charMap, noPermutations);
