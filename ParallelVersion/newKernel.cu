@@ -58,7 +58,7 @@ int main(int argc, char** argv){
 
     unsigned char* inputWord = (unsigned char*) calloc(strlen(argv[1]) + 1, sizeof(unsigned char));
     strcpy((char*)inputWord, argv[1]);
-    inputWordLength = strlen(inputWord);
+    inputWordLength = strlen((const char*)inputWord);
 
 
     // Generate hash
@@ -69,7 +69,7 @@ int main(int argc, char** argv){
     charMapLength = strlen((char*)staticCharSet);
     h_charMap = (unsigned char*) calloc(charMapLength,   sizeof(unsigned char));
     h_out     = (unsigned char*) calloc(inputWordLength, sizeof(unsigned char));
-    strcpy(h_charMap, (char*) staticCharSet);
+    strcpy((char*)h_charMap, (const char*) staticCharSet);
 
 
     // Allocate and initialize Gpu memory
@@ -91,7 +91,7 @@ int main(int argc, char** argv){
         blockDim.x = testWordLength;
         blockDim.y = 1;
         blockDim.x = 1;
-        gridDim.x  = Math.ceil(MAX_BLOCK_X / testWordLength);
+        gridDim.x  = ceil(MAX_BLOCK_X / testWordLength);
         gridDim.y  = 1;
         gridDim.z  = 1;
 
