@@ -107,6 +107,8 @@ int main(int argc, char** argv){
     gridDim.z  = 1;
 
     printf("Input Word: %s\nInput Word Length: %d\nCharacter Set:\"%s\"\nPossible Permutations: %d\n", inputWord, inputWordLength, h_charMap, noPermutations);
+    printf("noBatches: %d\nbatchSize: %d", noBatches, batchSize );
+
     int testWordLength = 1;
     for(; testWordLength <= inputWordLength; ++testWordLength) {
         blockDim.x = testWordLength;
