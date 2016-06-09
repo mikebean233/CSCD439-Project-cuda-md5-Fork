@@ -23,6 +23,7 @@ __device__ unsigned char correctPass[MAX_TOTAL];
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
+#include "time.h"
 
 #include "md5.cu" //This contains our MD5 helper functions
 #include "md5kernel.cu" //the CUDA thread
@@ -94,7 +95,7 @@ int main( int argc, char** argv) {
 		printf(" brute force md5 password hash cracking...\n");
 	}
 
-	long timeBefore = clock();
+	long timeBefore = currentTime();
 	if (performSerial) {
 		// ---------------------- CPU VERSION -----------------------------------
 
@@ -159,9 +160,9 @@ int main( int argc, char** argv) {
 	ZeroFill(currentBrute, MAX_BRUTE_LENGTH);
 	ZeroFill(cpuCorrectPass, MAX_TOTAL);
 
-	cudaEvent_t launch_begin, launch_end;
-	cudaEventCreate(&launch_begin);
-	cudaEventCreate(&launch_end);
+	//cudaEvent_t launch_begin, launch_end;
+	//cudaEventCreate(&launch_begin);
+	//cudaEventCreate(&launch_end);
 
 	//zero the container used to hold the correct pass
 	cudaMemcpyToSymbol(correctPass, &cpuCorrectPass, MAX_TOTAL, 0, cudaMemcpyHostToDevice);
@@ -196,10 +197,10 @@ int main( int argc, char** argv) {
 				}
 				printf("\n");
 			}
-			cudaEventRecord(launch_end, 0);
-			cudaEventSynchronize(launch_end);
+			//cudaEventRecord(launch_end, 0);
+			//cudaEventSynchronize(launch_end);
 			float time = 0;
-			cudaEventElapsedTime(&time, launch_begin, launch_end);
+			//cudaEventElapsedTime(&time, launch_begin, launch_end);
 
 			//if(verboseMode)
 			//	printf("done! GPU time cost in seconds: ");
@@ -209,7 +210,7 @@ int main( int argc, char** argv) {
 
 		finished = BruteIncrement(currentBrute, charSetLength, wordLength, numThreads * MD5_PER_KERNEL);
 
-		checkCUDAError("general");
+		//checkCUDAError("general");
 
 		if (ct % OUTPUT_INTERVAL == 0 && verboseMode) {
 			printf("STATUS: ");
@@ -231,7 +232,7 @@ int main( int argc, char** argv) {
 	exit:
 
 	// capture the end time
-	long timeAfter = clock();
+	long timeAfter = currentTime();
 
 	float timeCost = (timeAfter - timeBefore) / 1000000.0;
 
@@ -239,17 +240,6 @@ int main( int argc, char** argv) {
 		printf("Time Cost: ");
 
 	printf("%f\n", timeCost);
-
-
-
-
-
-
-
-
-
-
-
 
 	return 0;
 }
