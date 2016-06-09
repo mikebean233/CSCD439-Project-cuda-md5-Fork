@@ -33,7 +33,7 @@ __global__ void crack(uint wordLength, long beginningOffset, long batchSize, uns
     thisWord[threadIdx.x] = charMap[thisValue];
     __syncthreads();
 
-    printf("%s\n", thisWord);
+    printf("  %d  \n", permutationNo);
     uint c1,c2,c3,c4;
     md5_vfy(thisWord, wordLength, &c1, &c2, &c3, &c4);
 
