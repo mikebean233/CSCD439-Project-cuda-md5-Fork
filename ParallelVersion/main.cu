@@ -77,7 +77,7 @@ int main( int argc, char** argv) {
 
 	// Generate our character set
 	int charSetLength = 26;
-	unsigned char charSet[charSetLen];
+	unsigned char charSet[charSetLength];
 	memcpy(charSet, "abcdefghijklmnopqrstuvwxyz", charSetLength);
 
 	// Generate the MD5 hash for the input data
@@ -94,7 +94,7 @@ int main( int argc, char** argv) {
 		printf(" brute force md5 password hash cracking...\n");
 	}
 
-
+	long timeBefore = clock();
 	if (performSerial) {
 		// ---------------------- CPU VERSION -----------------------------------
 
@@ -158,7 +158,7 @@ int main( int argc, char** argv) {
 
 	ZeroFill(currentBrute, MAX_BRUTE_LENGTH);
 	ZeroFill(cpuCorrectPass, MAX_TOTAL);
-]
+
 	cudaEvent_t launch_begin, launch_end;
 	cudaEventCreate(&launch_begin);
 	cudaEventCreate(&launch_end);
