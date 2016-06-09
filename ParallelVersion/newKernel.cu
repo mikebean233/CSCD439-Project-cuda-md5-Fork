@@ -87,8 +87,8 @@ int main(int argc, char** argv){
     // Allocate and initialize Gpu memory
     cudaMalloc((void **) &d_charMap, sizeof(unsigned char) * charMapLength);
     //cudaMalloc((void **) &d_out,     sizeof(unsigned char) * inputWordLength);
-    cudaMemcpyToSymbol((void **)&charMap, h_charMap, charMapLength * sizeof(unsigned char), cudaMemcpyHostToDevice);
-    cudaMemcpyToSymbol(v, h_v, 4 * sizeof(uint), cudaMemcpyHostToDevice);
+    cudaMemcpyToSymbol("charMap", h_charMap, charMapLength * sizeof(unsigned char));
+    cudaMemcpyToSymbol("v", h_v, 4 * sizeof(uint));
 
 
     // Calculate the number of possible permutations
