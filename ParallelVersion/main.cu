@@ -64,6 +64,7 @@ int main( int argc, char** argv) {
 	int performSerial = 0;
 	int verboseMode = 0;
 	int paramIdx = 0;
+	int found = 0;
 
 	for (; paramIdx < argc; ++paramIdx) {
 		if (strcmp(argv[paramIdx], "-v") == 0)
@@ -133,6 +134,7 @@ int main( int argc, char** argv) {
 				if (guessV1 == v1 && guessV2 == v2 && guessV3 == v3 && guessV4 == v4) {
 					if (verboseMode)
 						printf("FOUND: %s\n", wordGuess);
+					fount = 1;
 					goto exit;
 				}
 			}
@@ -192,6 +194,7 @@ int main( int argc, char** argv) {
 				printf("\n");
 			}
 			float time = 0;
+			found = 1;
 			goto exit;
 		}
 
@@ -218,10 +221,13 @@ int main( int argc, char** argv) {
 
 	double timeCost = (timeAfter - timeBefore);
 
-	if (verboseMode)
+	if (verboseMode && found)
 		printf("Time Cost: ");
+	if(found)
+		printf("%lf\n", timeCost);
+	else
+		printf("------- NOT FOUND --------\n\n");
 
-	printf("%lf\n", timeCost);
 
 	return 0;
 }

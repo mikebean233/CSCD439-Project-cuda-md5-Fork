@@ -14,7 +14,7 @@ function runConfiguration {
     echo "--------- executing configuration: size=$size test value =$testVal ---------------"
     echo ""
 
-    times=($( ./md5Gpu "$testVal -s" ))
+    times=($( ./md5Gpu "$testVal" -s ))
     timep=($( ./md5Gpu "$testVal" ))
 
     ####### output=($( { ./md5Gpu -i "$testVal" 1> "testout.txt" ; } 2>&1 ))
