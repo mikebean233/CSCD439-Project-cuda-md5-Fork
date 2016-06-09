@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 /*
  *   Maximum number of threads per multiprocessor:  2048
  *   Maximum number of threads per block:           1024
@@ -16,7 +17,7 @@
 #define MAX_BLOCK_Y 1024
 #define MAX_BLOCK_Z 64
 __host__ __device__ void md5_vfy(unsigned char* data, uint length, uint *a1, uint *b1, uint *c1, uint *d1);
-__global__ void crack(uint wordLength, uint beginnigOffset, long long batchSize, unsigned char *out, unsigned char *charMap, uint charSetLength, uint v1, uint v2, uint v3, uint v4){
+__global__ void crack(uint wordLength, uint beginningOffset, long long batchSize, unsigned char *out, unsigned char *charMap, uint charSetLength, uint v1, uint v2, uint v3, uint v4){
     long long permutationNo = gridDim.x * blockIdx.y + blockIdx.x;
 
     extern __shared__ unsigned char thisWord[];
@@ -27,7 +28,7 @@ __global__ void crack(uint wordLength, uint beginnigOffset, long long batchSize,
 
     int thisValue = permutationNo % (charSetLength * (threadIdx.x + 1) + 1);
     thisWord[threadIdx.x] = charMap[thisValue];
-    int c1,c2,c3,c4;
+    uint c1,c2,c3,c4;
     md5_vfy(thisWord, wordLength, &c1, &c2, &c3, &c4);
     if(c1 == v1 && c2 == v2 && c3 == v3 && c4 == v4 ){
         out[threadIdx.x] = thisWord[threadIdx.x];
@@ -56,15 +57,15 @@ int main(int argc, char** argv){
         usage(argv[0]);
 
     unsigned char* inputWord = (unsigned char*) calloc(strlen(argv[1]) + 1, sizeof(unsigned char));
-    strcpy(inputWord, argv[1]);
+    strcpy((char*)inputWord, argv[1]);
     inputWordLength = strlen(inputWord);
 
 
     // Generate hash
-    md5_vfy(inputWord, &v1, &v2, &v3, &v4);
+    md5_vfy(inputWord, inputWordLength, &v1, &v2, &v3, &v4);
 
     // Allocate cpu memory
-    char* staticCharSet = "abcdefghijklmnopqrstuvwxyz";
+    char* staticCharSet = (char*)"abcdefghijklmnopqrstuvwxyz";
     charMapLength = strlen((char*)staticCharSet);
     h_charMap = (unsigned char*) calloc(charMapLength,   sizeof(unsigned char));
     h_out     = (unsigned char*) calloc(inputWordLength, sizeof(unsigned char));

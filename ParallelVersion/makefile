@@ -5,7 +5,7 @@ test: test.cu
 	nvcc -arch=sm_35 -o test test.cu
 
 newKernel: newKernel.cu md5.cu
-	nvcc -arch=sm_35 -o newKernel newKernel.cu md5.cu
+	nvcc -arch=sm_35 -o newKernel newKernel.cu md5.cu -lm
 
 clean:
 	rm *.o
