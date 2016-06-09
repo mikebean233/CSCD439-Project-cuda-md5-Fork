@@ -83,7 +83,8 @@ int main( int argc, char** argv) {
 
 	// Generate the MD5 hash for the input data
 	md5_vfy((unsigned char *) inputString, wordLength, &v1, &v2, &v3, &v4);
-	printf("hash for %s: %#x%x%x%x\n", inputString, v1, v2, v3, v4);
+	if(verboseMode)
+		printf("hash for %s: %#x%x%x%x\n", inputString, v1, v2, v3, v4);
 
 	// Crack the input hash
 	if (verboseMode) {
@@ -108,7 +109,7 @@ int main( int argc, char** argv) {
 
 		unsigned char *wordGuess = (unsigned char *) calloc(sizeof(unsigned char), wordLength);
 		long *powCash = (long *) calloc(sizeof(long), wordLength);
-		if (wordGuess == NULL || powCash == NULL) {
+		if (wordGuess == NULL || powCash == NULL && verboseMode) {
 			fprintf(stderr, "Error: Unable to allocate host memory on the heap\n");
 			exit(2);
 		}
@@ -159,10 +160,6 @@ int main( int argc, char** argv) {
 	ZeroFill(currentBrute, MAX_BRUTE_LENGTH);
 	ZeroFill(cpuCorrectPass, MAX_TOTAL);
 
-	//cudaEvent_t launch_begin, launch_end;
-	//cudaEventCreate(&launch_begin);
-	//cudaEventCreate(&launch_end);
-
 	//zero the container used to hold the correct pass
 	cudaMemcpyToSymbol(correctPass, &cpuCorrectPass, MAX_TOTAL, 0, cudaMemcpyHostToDevice);
 
@@ -171,8 +168,6 @@ int main( int argc, char** argv) {
 
 	bool finished = false;
 	int ct = 0;
-
-	//cudaEventRecord(launch_begin, 0);
 
 	do {
 		cudaMemcpyToSymbol(cudaBrute, &currentBrute, MAX_BRUTE_LENGTH, 0, cudaMemcpyHostToDevice);
@@ -196,20 +191,11 @@ int main( int argc, char** argv) {
 				}
 				printf("\n");
 			}
-			//cudaEventRecord(launch_end, 0);
-			//cudaEventSynchronize(launch_end);
 			float time = 0;
-			//cudaEventElapsedTime(&time, launch_begin, launch_end);
-
-			//if(verboseMode)
-			//	printf("done! GPU time cost in seconds: ");
-			//printf("%f\n", time / 1000);
 			goto exit;
 		}
 
 		finished = BruteIncrement(currentBrute, charSetLength, wordLength, numThreads * MD5_PER_KERNEL);
-
-		//checkCUDAError("general");
 
 		if (ct % OUTPUT_INTERVAL == 0 && verboseMode) {
 			printf("STATUS: ");
@@ -221,10 +207,7 @@ int main( int argc, char** argv) {
 		}
 		ct++;
 
-		//checkCUDAError();
 	} while (!finished);
-
-
 
 	// ---------------------- CUDA VERSION -----------------------------------
 	}

@@ -34,6 +34,7 @@ __global__ void crack(uint numThreads, uint charSetLen, uint bruteLength, uint v
 	i+= bruteLength;
 	totalLen = bruteLength;
 
+
 	IncrementBruteGPU(ourBrute, charSetLen, bruteLength, idx);
 	int timer = 0;
 	for(timer = 0; timer < MD5_PER_KERNEL; timer++)
