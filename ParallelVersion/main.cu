@@ -118,6 +118,7 @@ int main( int argc, char** argv)
 
 
 void performSerialSearch(unsigned char* word, unsigned char* charSet, int wordLength, int charSetLength, uint v1, uint v2, uint v3, uint v4, int verbose){
+	printf("---------- Serial Version ---------------");
 	long noCombinations = longPow(charSetLength, wordLength);
 	long combinationNo, combinationsThisRound;
 	int digitNo, thisGuessLength, thisDigitValue;
@@ -184,6 +185,9 @@ int intPow(int base, int exponent){
 
 
 void performParallelSearch(unsigned char* word, unsigned char* charSet, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose){
+	printf("---------- Parallel Version ---------------");
+
+
 	//cudaEvent_t launch_begin, launch_end;
 	//cudaEventCreate(&launch_begin);
 	//cudaEventCreate(&launch_end);
@@ -217,16 +221,6 @@ void performParallelSearch(unsigned char* word, unsigned char* charSet, uint wor
 
 		//get the "correct pass" and see if there really is one
 		cudaMemcpyFromSymbol(&cpuCorrectPass, correctPass, MAX_TOTAL, 0, cudaMemcpyDeviceToHost);
-
-		int k = 0;
-		while(cpuCorrectPass[k] != 0)
-		{
-			printf("%c", cpuCorrectPass[k]);
-			k++;
-		}
-		printf("\n");
-
-
 
 		if(cpuCorrectPass[0] != 0)
 		{
