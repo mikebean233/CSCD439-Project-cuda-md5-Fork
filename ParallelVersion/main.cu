@@ -149,7 +149,7 @@ void performSerialSearch(unsigned char* word, unsigned char* charSet, int wordLe
 			md5_vfy(wordGuess, thisGuessLength, &guessV1, &guessV2, &guessV3, &guessV4);
 			if(guessV1 == v1 && guessV2 == v2 && guessV3 == v3 && guessV4 == v4){
 				if(verbose)
-					printf("FOUND: %s", wordGuess);
+					printf("FOUND: %s\n", wordGuess);
 				return;
 			}
 		}
