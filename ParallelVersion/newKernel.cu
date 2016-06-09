@@ -33,7 +33,7 @@ __global__ void crack(uint wordLength, long beginningOffset, long batchSize, uns
     thisWord[threadIdx.x] = charMap[thisValue];
     __syncthreads();
 
-    printf("permutation:  %d  beginningOffset: %d  wordLength: %d\n", permutationNo, beginningOffset, wordLength);
+    printf("permutation:  %d  beginningOffset: %ld  wordLength: %d\n", permutationNo, beginningOffset, wordLength);
     uint c1,c2,c3,c4;
     md5_vfy(thisWord, wordLength, &c1, &c2, &c3, &c4);
 
@@ -95,7 +95,7 @@ int main(int argc, char** argv){
         noPermutations *= charMapLength;
     }
 
-    batchSize = max(noPermutations, (long long ) MAX_BATCH_SIZE);
+    batchSize = min(noPermutations, (long long ) MAX_BATCH_SIZE);
     noBatches = max((int)ceil(noPermutations / batchSize), 1);
 
 
