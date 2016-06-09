@@ -51,10 +51,10 @@ int main(int argc, char** argv){
 
     // Host
     unsigned char *h_charMap, *h_out;
-    uint h_wordLength, h_batchSize, h_charSetLength, v1, v2, v3, v4;
+    uint v1, v2, v3, v4;
     int inputWordLength;
     int charMapLength;
-    long batchSize;
+    long noBatches, batchSize;
 
     // Configuration variables
     dim3 gridDim;
@@ -96,7 +96,7 @@ int main(int argc, char** argv){
     }
 
     batchSize = max(noPermutations, (long long ) MAX_BATCH_SIZE);
-    long noBatches = ceil(noPermutations / batchSize);
+    noBatches = max(ceil(noPermutations / batchSize), 1);
 
 
 //    blockDim.x = testWordLength;
@@ -107,7 +107,7 @@ int main(int argc, char** argv){
     gridDim.z  = 1;
 
     printf("Input Word: %s\nInput Word Length: %d\nCharacter Set:\"%s\"\nPossible Permutations: %d\n", inputWord, inputWordLength, h_charMap, noPermutations);
-    printf("noBatches: %d\nbatchSize: %d", noBatches, batchSize );
+    printf("noBatches: %d\nbatchSize: %d\n", noBatches, batchSize );
 
     int testWordLength = 1;
     for(; testWordLength <= inputWordLength; ++testWordLength) {
