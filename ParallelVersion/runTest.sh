@@ -6,18 +6,16 @@ outfile="output.txt"
 echo "size, time serial, time parallel" > "$outfile"
 
 function runConfiguration {
-    OLDIFS="$IFS"
-    IFS="~"
+    #OLDIFS="$IFS"
+    #IFS="~"
     size=$1
     testVal=$2
-
-
 
     echo "--------- executing configuration: size=$size test value =$testVal ---------------"
     echo ""
 
-    times=($(./md5Gpu -i "$testVal -s"))
-    timep=($(./md5Gpu -i "$testVal"))
+    times=($( ./md5Gpu "$testVal -s" ))
+    timep=($( ./md5Gpu "$testVal" ))
 
     ####### output=($( { ./md5Gpu -i "$testVal" 1> "testout.txt" ; } 2>&1 ))
     ##exitStatus=$?
