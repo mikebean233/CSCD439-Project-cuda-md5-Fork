@@ -25,7 +25,6 @@ __global__ void crack(uint wordLength, uint beginningOffset, long long batchSize
     long long permutationNo = gridDim.x * blockIdx.y + blockIdx.x;
 
     extern __shared__ unsigned char thisWord[];
-    extern __constant__ const unsigned char *charMap;
 
     if(permutationNo > batchSize)
         return;
