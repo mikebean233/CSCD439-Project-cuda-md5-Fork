@@ -88,12 +88,12 @@ int main(int argc, char** argv){
         noPermutations *= charMapLength;
     }
 
-    printf("Input Word: %s\nInput Word Length: %d\nCharacter Set:\"%s\"Possible Permutations: $l", inputWord, inputWordLength, h_charMap, noPermutations);
+    printf("Input Word: %s\nInput Word Length: %d\nCharacter Set:\"%s\"\nPossible Permutations: $lld\n", inputWord, inputWordLength, h_charMap, noPermutations);
     int testWordLength = 1;
     for(; testWordLength <= inputWordLength; ++testWordLength){
         blockDim.x = testWordLength;
         blockDim.y = 1;
-        blockDim.x = 1;
+        blockDim.z = 1;
         gridDim.x  = (int) noPermutations;//ceil(MAX_GRID_X / testWordLength);
         gridDim.y  = 1;
         gridDim.z  = 1;
