@@ -187,7 +187,7 @@ int intPow(int base, int exponent){
 
 void performParallelSearch(unsigned char* word, unsigned char* charSet, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose){
 	if(verbose)
-		printf("---------- Parallel Version ---------------");
+		printf("---------- Parallel Version ---------------\n");
 
 
 	cudaEvent_t launch_begin, launch_end;
@@ -262,7 +262,7 @@ void performParallelSearch(unsigned char* word, unsigned char* charSet, uint wor
 		}
 		ct++;
 
-		checkCUDAError();
+		//checkCUDAError();
 	} while(!finished);
 
 
