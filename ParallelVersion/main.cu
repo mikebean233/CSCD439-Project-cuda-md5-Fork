@@ -20,6 +20,9 @@
 __device__ __constant__ unsigned char cudaBrute[MAX_BRUTE_LENGTH];
 __device__ __constant__ unsigned char cudaCharSet[95];
 __device__ unsigned char correctPass[MAX_TOTAL];
+void usage(char* programName);
+void performSerialSearch(char* word, char* charset, int wordLength, int charSetLength, int v1, int v2, int v3, int v4, int verbose);
+void performParallelSearch(char* word, char* charset, int wordLength, int charSetLength, int v1, int v2, int v3, int v4, int verbose);
 
 #include <stdio.h>
 #include <time.h>
@@ -118,7 +121,6 @@ void performSerialSearch(char* word, char* charset, int wordLength, int charSetL
 	long combinationNo, combinationsThisRound;
 	int digitNo, charIdx, thisGuessLength, thisDigitValue;
 	int guessV1, guessV2, guessV3, guessV4;
-
 
 	char* wordGuess = (char*) calloc(sizeof(char), wordLength);
 	if(wordGuess == null){
