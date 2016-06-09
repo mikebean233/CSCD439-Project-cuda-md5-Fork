@@ -25,16 +25,16 @@ __global__ void crack(uint wordLength, uint beginningOffset, long long batchSize
     if(permutationNo > batchSize)
         return;
 
-    permutationNo += beginningOffset;
+    //permutationNo += beginningOffset;
 
-    int thisValue = permutationNo % (charSetLength * (threadIdx.x + 1) + 1);
-    thisWord[threadIdx.x] = charMap[thisValue];
-    uint c1,c2,c3,c4;
-    md5_vfy(thisWord, wordLength, &c1, &c2, &c3, &c4);
+    //int thisValue = permutationNo % (charSetLength * (threadIdx.x + 1) + 1);
+    //thisWord[threadIdx.x] = charMap[thisValue];
+    //uint c1,c2,c3,c4;
+    //md5_vfy(thisWord, wordLength, &c1, &c2, &c3, &c4);
 
-    if(c1 == v1 && c2 == v2 && c3 == v3 && c4 == v4 ){
-        out[threadIdx.x] = thisWord[threadIdx.x];
-    }
+    //if(c1 == v1 && c2 == v2 && c3 == v3 && c4 == v4 ){
+    //    out[threadIdx.x] = thisWord[threadIdx.x];
+   // }
 }
 
 void usage(char* programName);
@@ -78,7 +78,7 @@ int main(int argc, char** argv){
     // Allocate and initialize Gpu memory
     cudaMalloc((void **) &d_charMap, sizeof(unsigned char) * charMapLength);
     cudaMalloc((void **) &d_out,     sizeof(unsigned char) * inputWordLength);
-    cudaMemset (charMap,0,sizeof(unsigned char) * charMapLength);
+    cudaMemset (d_charMap,0,sizeof(unsigned char) * charMapLength);
     cudaMemset (d_out,0,sizeof(unsigned char) * inputWordLength);
     cudaMemcpy(d_charMap, h_charMap, charMapLength * sizeof(unsigned char), cudaMemcpyHostToDevice);
 
@@ -90,16 +90,17 @@ int main(int argc, char** argv){
         noPermutations *= charMapLength;
     }
 
+//    blockDim.x = testWordLength;
+    blockDim.y = 1;
+    blockDim.z = 1;
+    gridDim.x  = min(noPermutations, MAX_GRID_Y) ;//(int) noPermutations;//ceil(MAX_GRID_X / testWordLength);
+    gridDim.y  = ceil(noPermutations / gridDim.x);
+    gridDim.z  = 1;
+
     printf("Input Word: %s\nInput Word Length: %d\nCharacter Set:\"%s\"\nPossible Permutations: %d\n", inputWord, inputWordLength, h_charMap, noPermutations);
     int testWordLength = 1;
     for(; testWordLength <= inputWordLength; ++testWordLength){
         blockDim.x = testWordLength;
-        blockDim.y = 1;
-        blockDim.z = 1;
-        gridDim.x  = (int) noPermutations;//ceil(MAX_GRID_X / testWordLength);
-        gridDim.y  = 1;
-        gridDim.z  = 1;
-
         crack <<< gridDim, blockDim, testWordLength >>> (testWordLength, 0, noPermutations, d_out, d_charMap, charMapLength, v1, v2, v3, v4);
         cudaMemcpy(h_out, d_out, testWordLength, cudaMemcpyDeviceToHost);
         if(h_out[0] != '\0'){
