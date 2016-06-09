@@ -21,25 +21,18 @@ __global__ void crack(uint numThreads, uint charSetLen, uint bruteLength, uint v
     	uint idx = (blockIdx.x*blockDim.x + threadIdx.x);
 	int totalLen = 0;
 	int bruteStart = 0;
-
+	int i;
 	unsigned char word[MAX_TOTAL];
 	unsigned char ourBrute[MAX_BRUTE_LENGTH];
-
-	int i = 0;
-
 	for(i = 0; i < MAX_BRUTE_LENGTH; i++)
 	{
 		ourBrute[i] = cudaBrute[i];
 	}
 	
 	i = 0;
-	//int ary_i = 0;
-	//unsigned char tmp = 0;
-
 	bruteStart = 0;
 	i+= bruteLength;
-	ary_i = 0;
-	totalLen = bruteLength;
+	otalLen = bruteLength;
 
 	IncrementBruteGPU(ourBrute, charSetLen, bruteLength, idx);
 	int timer = 0;
