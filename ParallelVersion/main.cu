@@ -57,24 +57,21 @@ bool BruteIncrement(unsigned char* brute, int setLen, int wordLength, int increm
 
 int main( int argc, char** argv) 
 {
-	// Parse Command line argumants
+	// Parse Command line arguments
 	if(argc < 2)
 		usage(argv[0]);
 
 	int wordLength = strlen(argv[1]);
 	int performSerial = 0;
 	int verboseMode = 0;
-	if(argc > 2)
-		if(strcmp("-s", argv[2]) == 0)
-			performSerial = 1;
-		else
-			usage(argv[0]);
+	int paramIdx = 0;
 
-	if(argc > 3)
-		if(strcmp("-v", argv[3]) == 0)
+	for(; paramIdx < argc; ++i){
+		if(strcmp(argv[paramIdx], "-v") == 0)
 			verboseMode = 1;
-		else
-			usage(argv[0]);
+		if(strcmp(argv[paramIdx], "-s") == 0)
+			performSerial = 1;
+	}
 
 	unsigned char* inputString = (unsigned char*) malloc(sizeof(unsigned char) * wordLength + 1);
 	strcpy((char*)inputString, argv[1]);
