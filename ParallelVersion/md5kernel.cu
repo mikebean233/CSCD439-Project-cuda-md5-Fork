@@ -33,7 +33,7 @@ __global__ void crack(uint numThreads, uint charSetLen, uint bruteLength, uint v
 	}
 	
 	i = 0;
-	int ary_i = 0;
+	//int ary_i = 0;
 	//unsigned char tmp = 0;
 
 	bruteStart = 0;

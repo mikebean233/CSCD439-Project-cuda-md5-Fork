@@ -124,7 +124,7 @@ int main( int argc, char** argv)
 void performSerialSearch(unsigned char* word, unsigned char* charSet, int wordLength, int charSetLength, uint v1, uint v2, uint v3, uint v4, int verbose){
 	long noCombinations = longPow(charSetLength, wordLength);
 	long combinationNo, combinationsThisRound;
-	int digitNo, charIdx, thisGuessLength, thisDigitValue;
+	int digitNo, thisGuessLength, thisDigitValue;
 	uint guessV1, guessV2, guessV3, guessV4;
 
 	unsigned char* wordGuess = (unsigned char*) calloc(sizeof(unsigned char), wordLength);
@@ -245,7 +245,7 @@ void performParallelSearch(unsigned char* word, unsigned char* charSet, uint wor
 			return;
 		}
 
-		finished = BruteIncrement(currentBrute, charSetLen, wordLength, numThreads * MD5_PER_KERNEL);
+		finished = BruteIncrement(currentBrute, charSetLength, wordLength, numThreads * MD5_PER_KERNEL);
 
 		checkCUDAError("general");
 
