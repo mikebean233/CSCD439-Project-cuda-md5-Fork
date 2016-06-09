@@ -218,9 +218,18 @@ void performParallelSearch(unsigned char* word, unsigned char* charSet, uint wor
 		//get the "correct pass" and see if there really is one
 		cudaMemcpyFromSymbol(&cpuCorrectPass, correctPass, MAX_TOTAL, 0, cudaMemcpyDeviceToHost);
 
+		int k = 0;
+		while(cpuCorrectPass[k] != 0)
+		{
+			printf("%c", cpuCorrectPass[k]);
+			k++;
+		}
+		printf("\n");
+
+
+
 		if(cpuCorrectPass[0] != 0)
 		{
-			printf("found");
 			if(verbose){
 				printf("\n\nFOUND: ");
 				int k = 0;
