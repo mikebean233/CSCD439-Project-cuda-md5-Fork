@@ -54,10 +54,9 @@ bool BruteIncrement(unsigned char* brute, int setLen, int wordLength, int increm
 	return incrementBy != 0; //we are done if there is a remainder, because we have looped over the max
 }
 
-int main( int argc, char** argv) 
-{
+int main( int argc, char** argv) {
 	// Parse Command line arguments
-	if(argc < 2)
+	if (argc < 2)
 		usage(argv[0]);
 
 	int wordLength = strlen(argv[1]);
@@ -65,16 +64,16 @@ int main( int argc, char** argv)
 	int verboseMode = 0;
 	int paramIdx = 0;
 
-	for(; paramIdx < argc; ++paramIdx){
-		if(strcmp(argv[paramIdx], "-v") == 0)
+	for (; paramIdx < argc; ++paramIdx) {
+		if (strcmp(argv[paramIdx], "-v") == 0)
 			verboseMode = 1;
-		if(strcmp(argv[paramIdx], "-s") == 0)
+		if (strcmp(argv[paramIdx], "-s") == 0)
 			performSerial = 1;
 	}
 
-	unsigned char* inputString = (unsigned char*) malloc(sizeof(unsigned char) * wordLength + 1);
-	strcpy((char*)inputString, argv[1]);
-	uint v1,v2,v3,v4;
+	unsigned char *inputString = (unsigned char *) malloc(sizeof(unsigned char) * wordLength + 1);
+	strcpy((char *) inputString, argv[1]);
+	uint v1, v2, v3, v4;
 
 	// Generate our character set
 	int charSetLen = 26;
@@ -82,95 +81,189 @@ int main( int argc, char** argv)
 	memcpy(charSet, "abcdefghijklmnopqrstuvwxyz", charSetLen);
 
 	// Generate the MD5 hash for the input data
-	md5_vfy((unsigned char*)inputString, wordLength, &v1, &v2, &v3, &v4);
-	printf("hash for %s: %#x%x%x%x\n", inputString, v1,v2,v3,v4);
+	md5_vfy((unsigned char *) inputString, wordLength, &v1, &v2, &v3, &v4);
+	printf("hash for %s: %#x%x%x%x\n", inputString, v1, v2, v3, v4);
 
 	// Crack the input hash
-	if(verboseMode){
+	if (verboseMode) {
 		printf("performing ");
-		if(performSerial)
+		if (performSerial)
 			printf("serial");
 		else
 			printf("parallel");
 		printf(" brute force md5 password hash cracking...\n");
 	}
 
-	// capture the start time
-	long timeBefore = clock();
+
+	if (peformSerial) {
+		// ---------------------- CPU VERSION -----------------------------------
 
 
+		if (verbose)
+			printf("---------- Serial Version ---------------");
+		long noCombinations = longPow(charSetLength, wordLength);
+		long combinationNo, combinationsThisRound;
+		int digitNo, thisGuessLength, thisDigitValue;
+		uint guessV1, guessV2, guessV3, guessV4;
+
+		unsigned char *wordGuess = (unsigned char *) calloc(sizeof(unsigned char), wordLength);
+		long *powCash = (long *) calloc(sizeof(long), wordLength);
+		if (wordGuess == NULL || powCash == NULL) {
+			fprintf(stderr, "Error: Unable to allocate host memory on the heap\n");
+			exit(2);
+		}
+
+		// Build our pow cash
+		for (digitNo = 0; digitNo < wordLength; ++digitNo) {
+			powCash[digitNo] = longPow(charSetLength, digitNo);
+		}
+
+		// Make our guesses
+		thisGuessLength = 1;
+		for (; thisGuessLength <= wordLength; ++thisGuessLength) {
+			combinationsThisRound = longPow(charSetLength, thisGuessLength);
+			combinationNo = 0;
+			for (; combinationNo < combinationsThisRound; ++combinationNo) {
+				for (digitNo = 0; digitNo < thisGuessLength; ++digitNo) {
+					thisDigitValue = (combinationNo / powCash[digitNo]) % charSetLength;
+					wordGuess[digitNo] = charSet[thisDigitValue];
+				}
+				md5_vfy(wordGuess, thisGuessLength, &guessV1, &guessV2, &guessV3, &guessV4);
+				if (guessV1 == v1 && guessV2 == v2 && guessV3 == v3 && guessV4 == v4) {
+					if (verbose)
+						printf("FOUND: %s\n", wordGuess);
+					return;
+				}
+			}
+		}
+
+		if (powCash != NULL)
+			free(powCash);
+		if (wordGuess != NULL)
+			free(wordGuess);
 
 
+		// ---------------------- CPU VERSION -----------------------------------
+
+	}
+	else {
+	// ---------------------- CUDA VERSION -----------------------------------
+
+	if (verbose)
+		printf("---------- Parallel Version ---------------\n");
+
+	int numThreads = BLOCKS * THREADS_PER_BLOCK;
+	unsigned char currentBrute[MAX_BRUTE_LENGTH];
+	unsigned char cpuCorrectPass[MAX_TOTAL];
+
+	ZeroFill(currentBrute, MAX_BRUTE_LENGTH);
+	ZeroFill(cpuCorrectPass, MAX_TOTAL);
+
+
+	cudaEvent_t launch_begin, launch_end;
+	cudaEventCreate(&launch_begin);
+	cudaEventCreate(&launch_end);
+
+	int numThreads = BLOCKS * THREADS_PER_BLOCK;
+	unsigned char currentBrute[MAX_BRUTE_LENGTH];
+	unsigned char cpuCorrectPass[MAX_TOTAL];
+
+	ZeroFill(currentBrute, MAX_BRUTE_LENGTH);
+	ZeroFill(cpuCorrectPass, MAX_TOTAL);
 
 	//zero the container used to hold the correct pass
-	//cudaMemcpyToSymbol(correctPass, &cpuCorrectPass, MAX_TOTAL, 0, cudaMemcpyHostToDevice);
+	cudaMemcpyToSymbol(correctPass, &cpuCorrectPass, MAX_TOTAL, 0, cudaMemcpyHostToDevice);
 
 	//create and copy the charset to device
-	cudaMemcpyToSymbol(cudaCharSet, &charSet, charSetLen, 0, cudaMemcpyHostToDevice);
+	cudaMemcpyToSymbol(cudaCharSet, &charSet, charSetLength, 0, cudaMemcpyHostToDevice);
+
+	bool finished = false;
+	int ct = 0;
+
+	cudaEventRecord(launch_begin, 0);
+
+	do {
+		cudaMemcpyToSymbol(cudaBrute, &currentBrute, MAX_BRUTE_LENGTH, 0, cudaMemcpyHostToDevice);
+
+		//run the kernel
+		dim3 dimGrid(BLOCKS);
+		dim3 dimBlock(THREADS_PER_BLOCK);
+
+		crack << < dimGrid, dimBlock >> > (numThreads, charSetLength, wordLength, v1, v2, v3, v4);
+
+		//get the "correct pass" and see if there really is one
+		cudaMemcpyFromSymbol(&cpuCorrectPass, correctPass, MAX_TOTAL, 0, cudaMemcpyDeviceToHost);
+
+		if (cpuCorrectPass[0] != 0) {
+			if (verbose) {
+				printf("\n\nFOUND: ");
+				int k = 0;
+				while (cpuCorrectPass[k] != 0) {
+					printf("%c", cpuCorrectPass[k]);
+					k++;
+				}
+				printf("\n");
+			}
+			cudaEventRecord(launch_end, 0);
+			cudaEventSynchronize(launch_end);
+			float time = 0;
+			cudaEventElapsedTime(&time, launch_begin, launch_end);
+
+			//if(verbose)
+			//	printf("done! GPU time cost in seconds: ");
+			//printf("%f\n", time / 1000);
+			return;
+		}
+
+		finished = BruteIncrement(currentBrute, charSetLength, wordLength, numThreads * MD5_PER_KERNEL);
+
+		checkCUDAError("general");
+
+		if (ct % OUTPUT_INTERVAL == 0 && verbose) {
+			printf("STATUS: ");
+			int k = 0;
+
+			for (k = 0; k < wordLength; k++)
+				printf("%c", charSet[currentBrute[k]]);
+			printf("\n");
+		}
+		ct++;
+
+		//checkCUDAError();
+	} while (!finished);
 
 
-	// perform the search
-	if(performSerial)
-		performSerialSearch(inputString, charSet, wordLength, charSetLen, v1, v2, v3, v4, verboseMode);
-	else
-		performParallelSearch(inputString, charSet, wordLength, charSetLen, v1, v2, v3, v4, verboseMode);
+
+	// ---------------------- CUDA VERSION -----------------------------------
+	}
 
 	// capture the end time
 	long timeAfter = clock();
 
-	float timeCost = (timeAfter - timeBefore ) / 1000000.0;
+	float timeCost = (timeAfter - timeBefore) / 1000000.0;
 
-	if(verboseMode)
+	if (verboseMode)
 		printf("Time Cost: ");
 
 	printf("%f\n", timeCost);
+
+
+
+
+
+
+
+
+
+
+
+
 	return 0;
 }
 
 
 void performSerialSearch(unsigned char* word, unsigned char* charSet, int wordLength, int charSetLength, uint v1, uint v2, uint v3, uint v4, int verbose){
-	if(verbose)
-		printf("---------- Serial Version ---------------");
-	long noCombinations = longPow(charSetLength, wordLength);
-	long combinationNo, combinationsThisRound;
-	int digitNo, thisGuessLength, thisDigitValue;
-	uint guessV1, guessV2, guessV3, guessV4;
 
-	unsigned char* wordGuess = (unsigned char*) calloc(sizeof(unsigned char), wordLength);
-	long* powCash = (long*) calloc(sizeof(long), wordLength);
-	if(wordGuess == NULL || powCash == NULL){
-		fprintf(stderr, "Error: Unable to allocate host memory on the heap\n");
-		exit(2);
-	}
-
-	// Build our pow cash
-	for (digitNo = 0; digitNo < wordLength; ++digitNo) {
-		powCash[digitNo] = longPow(charSetLength, digitNo);
-	}
-
-	// Make our guesses
-	thisGuessLength = 1;
-	for (; thisGuessLength <= wordLength; ++thisGuessLength) {
-		combinationsThisRound = longPow(charSetLength, thisGuessLength);
-		combinationNo = 0;
-		for (; combinationNo < combinationsThisRound; ++combinationNo) {
-			for (digitNo = 0; digitNo < thisGuessLength; ++digitNo) {
-				thisDigitValue = (combinationNo / powCash[digitNo]) % charSetLength;
-				wordGuess[digitNo] = charSet[thisDigitValue];
-			}
-			md5_vfy(wordGuess, thisGuessLength, &guessV1, &guessV2, &guessV3, &guessV4);
-			if(guessV1 == v1 && guessV2 == v2 && guessV3 == v3 && guessV4 == v4){
-				if(verbose)
-					printf("FOUND: %s\n", wordGuess);
-				return;
-			}
-		}
-	}
-
-	if(powCash != NULL)
-		free(powCash);
-	if(wordGuess != NULL)
-		free(wordGuess);
 }
 
 long longPow(int base, int exponent){
@@ -197,94 +290,6 @@ int intPow(int base, int exponent){
 
 
 void performParallelSearch(unsigned char* word, unsigned char* charSet, uint wordLength, uint charSetLength, uint v1, uint v2, uint v3, uint v4, uint verbose){
-	if(verbose)
-		printf("---------- Parallel Version ---------------\n");
-
-	int numThreads = BLOCKS * THREADS_PER_BLOCK;
-	unsigned char currentBrute[MAX_BRUTE_LENGTH];
-	unsigned char cpuCorrectPass[MAX_TOTAL];
-
-	ZeroFill(currentBrute, MAX_BRUTE_LENGTH);
-	ZeroFill(cpuCorrectPass, MAX_TOTAL);
-
-
-
-	cudaEvent_t launch_begin, launch_end;
-	cudaEventCreate(&launch_begin);
-	cudaEventCreate(&launch_end);
-/*
-	int numThreads = BLOCKS * THREADS_PER_BLOCK;
-	unsigned char currentBrute[MAX_BRUTE_LENGTH];
-	unsigned char cpuCorrectPass[MAX_TOTAL];
-
-	ZeroFill(currentBrute, MAX_BRUTE_LENGTH);
-	ZeroFill(cpuCorrectPass, MAX_TOTAL);
-
-	//zero the container used to hold the correct pass
-	cudaMemcpyToSymbol(correctPass, &cpuCorrectPass, MAX_TOTAL, 0, cudaMemcpyHostToDevice);
-
-	//create and copy the charset to device
-	cudaMemcpyToSymbol(cudaCharSet, &charSet, charSetLength, 0, cudaMemcpyHostToDevice);
-*/
-
-	bool finished = false;
-	int ct = 0;
-
-	cudaEventRecord(launch_begin,0);
-
-	do{
-		cudaMemcpyToSymbol(cudaBrute, &currentBrute, MAX_BRUTE_LENGTH, 0, cudaMemcpyHostToDevice);
-
-		//run the kernel
-		dim3 dimGrid(BLOCKS);
-		dim3 dimBlock(THREADS_PER_BLOCK);
-
-		crack<<<dimGrid, dimBlock>>>(numThreads, charSetLength, wordLength, v1,v2,v3,v4);
-
-		//get the "correct pass" and see if there really is one
-		cudaMemcpyFromSymbol(&cpuCorrectPass, correctPass, MAX_TOTAL, 0, cudaMemcpyDeviceToHost);
-
-		if(cpuCorrectPass[0] != 0)
-		{
-			if(verbose){
-				printf("\n\nFOUND: ");
-				int k = 0;
-				while(cpuCorrectPass[k] != 0)
-				{
-					printf("%c", cpuCorrectPass[k]);
-					k++;
-				}
-				printf("\n");
-			}
-			cudaEventRecord(launch_end,0);
-			cudaEventSynchronize(launch_end);
-			float time = 0;
-			cudaEventElapsedTime(&time, launch_begin, launch_end);
-
-			//if(verbose)
-			//	printf("done! GPU time cost in seconds: ");
-			//printf("%f\n", time / 1000);
-			return;
-		}
-
-		finished = BruteIncrement(currentBrute, charSetLength, wordLength, numThreads * MD5_PER_KERNEL);
-
-		checkCUDAError("general");
-
-		if(ct % OUTPUT_INTERVAL == 0 && verbose)
-		{
-			printf("STATUS: ");
-			int k = 0;
-
-			for(k = 0; k < wordLength; k++)
-				printf("%c",charSet[currentBrute[k]]);
-			printf("\n");
-		}
-		ct++;
-
-		//checkCUDAError();
-	} while(!finished);
-
 
 }
 
