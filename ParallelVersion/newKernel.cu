@@ -18,8 +18,8 @@
 #define MAX_BLOCK_Y 1024
 #define MAX_BLOCK_Z 64
 
-__constant__ int v[4];
-__constant__ unsigned char charMap[26];
+__device__ __constant__ int v[4];
+__device__ __constant__ unsigned char charMap[26];
 
 __global__ void crack(uint wordLength, uint beginningOffset, long long batchSize, unsigned char *out, uint charSetLength) {
     long long permutationNo = gridDim.x * blockIdx.y + blockIdx.x;
@@ -87,8 +87,8 @@ int main(int argc, char** argv){
     // Allocate and initialize Gpu memory
     cudaMalloc((void **) &d_charMap, sizeof(unsigned char) * charMapLength);
     //cudaMalloc((void **) &d_out,     sizeof(unsigned char) * inputWordLength);
-    cudaMemcpyToSymbol("charMap", h_charMap, charMapLength * sizeof(unsigned char));
-    cudaMemcpyToSymbol("v", h_v, 4 * sizeof(uint));
+    cudaMemcpyToSymbol("charMap", &h_charMap, charMapLength * sizeof(unsigned char));
+    cudaMemcpyToSymbol("v", &h_v, 4 * sizeof(uint));
 
 
     // Calculate the number of possible permutations
