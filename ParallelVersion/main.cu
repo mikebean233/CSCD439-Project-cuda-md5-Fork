@@ -7,13 +7,12 @@
 //TODO: get command line arguments
 //TODO: md5 2nd block
 
-#define MAX_BRUTE_LENGTH 14 
-#define MAX_SALT_LENGTH 38
-#define MAX_TOTAL (MAX_SALT_LENGTH + MAX_BRUTE_LENGTH + MAX_SALT_LENGTH)
+#define MAX_BRUTE_LENGTH 30
+#define MAX_TOTAL MAX_BRUTE_LENGTH
 
 //Performance:
 #define BLOCKS 128
-#define THREADS_PER_BLOCK 256
+#define THREADS_PER_BLOCK 512
 #define MD5_PER_KERNEL 600
 #define OUTPUT_INTERVAL 20
 
@@ -108,7 +107,7 @@ int main( int argc, char** argv)
 	// capture the end time
 	long timeAfter = clock();
 
-	float timeCost = (timeBefore - timeAfter )/1000000.0;
+	float timeCost = (timeAfter - timeBefore ) / 1000000.0;
 
 	if(verboseMode)
 		printf("Time Cost: ");
@@ -225,8 +224,8 @@ void performParallelSearch(unsigned char* word, unsigned char* charSet, uint wor
 				printf("\n\nFOUND: ");
 				int k = 0;
 				while(cpuCorrectPass[k] != 0)
-				{	if(verbose)
-						printf("%c", cpuCorrectPass[k]);
+				{
+					printf("%c", cpuCorrectPass[k]);
 					k++;
 				}
 				printf("\n");
