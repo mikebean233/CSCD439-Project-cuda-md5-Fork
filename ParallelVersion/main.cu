@@ -195,7 +195,6 @@ int main( int argc, char** argv) {
 				}
 				printf("\n");
 			}
-			float time = 0;
 			found = 1;
 			goto exit;
 		}
