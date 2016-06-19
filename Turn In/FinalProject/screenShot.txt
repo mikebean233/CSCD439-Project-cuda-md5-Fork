@@ -1,0 +1,70 @@
+mpeterson10@cscd-gpu01:~/github/CSCD439-Project-cuda-md5-Fork/ParallelVersion$ make test
+make test
+makefile:14: warning: overriding commands for target `test'
+makefile:5: warning: ignoring old commands for target `test'
+echo  > output.txt
+echo "length,serial,parallel" > output.txt
+echo "1,`./md5Gpu z -s`,`./md5Gpu z`" >> output.txt
+echo "1,`./md5Gpu z -s`,`./md5Gpu z`" >> output.txt
+echo "2,`./md5Gpu zz -s`,`./md5Gpu zz`" >> output.txt
+echo "2,`./md5Gpu zz -s`,`./md5Gpu zz`" >> output.txt
+echo "3,`./md5Gpu zzz -s`,`./md5Gpu zzz`" >> output.txt
+echo "3,`./md5Gpu zzz -s`,`./md5Gpu zzz`" >> output.txt
+echo "4,`./md5Gpu zzzz -s`,`./md5Gpu zzzz`" >> output.txt
+echo "4,`./md5Gpu zzzz -s`,`./md5Gpu zzzz`" >> output.txt
+echo "5,`./md5Gpu zzzzz -s`,`./md5Gpu zzzzz`" >> output.txt
+echo "5,`./md5Gpu zzzzz -s`,`./md5Gpu zzzzz`" >> output.txt
+echo "6,`./md5Gpu zzzzzz -s`,`./md5Gpu zzzzzz`" >> output.txt
+echo "6,`./md5Gpu zzzzzz -s`,`./md5Gpu zzzzzz`" >> output.txt
+echo "7,-----,`./md5Gpu zzzzzzz`" >> output.txt
+echo "7,-----,`./md5Gpu zzzzzzz`" >> output.txt
+echo "8,-----,`./md5Gpu zzzzzzzz`" >> output.txt
+echo "8,-----,`./md5Gpu zzzzzzzz`" >> output.txt
+mpeterson10@cscd-gpu01:~/github/CSCD439-Project-cuda-md5-Fork/ParallelVersion$ ls
+ls
+errout.txt  makefile  md5Gpu        newKernel   README.txt  test.cu   test.txt   timing.h
+main.cu     md5.cu    md5kernel.cu  output.txt  runTest.sh  test.php  timing.cu
+mpeterson10@cscd-gpu01:~/github/CSCD439-Project-cuda-md5-Fork/ParallelVersion$ cat output.txt
+cat output.txt
+length,serial,parallel
+1,0.000035,0.411324
+1,0.000035,0.359664
+2,0.000920,0.190275
+2,0.000917,0.222556
+3,0.017903,0.223310
+3,0.020938,0.207766
+4,0.338724,0.205371
+4,0.300411,0.205790
+5,6.604192,0.270746
+5,6.596024,0.269526
+6,176.664046,0.404638
+6,176.516597,0.404078
+7,-----,5.593492
+7,-----,5.570958
+8,-----,135.579340
+8,-----,135.861491
+
+
+
+
+mpeterson10@cscd-gpu01:~/github/CSCD439-Project-cuda-md5-Fork/Turn In$ ./project
+./project
+usage: ./project targetWord [-s][-v]
+       -s: perform serial Version (if omitted, the paralell version will be used)
+       -v: Be verbose (if omitted only the time cost of the implementation will be printed
+mpeterson10@cscd-gpu01:~/github/CSCD439-Project-cuda-md5-Fork/Turn In$ ./project abcde -s -v
+./project abcde -s -v
+hash for abcde: 0xd9b456ab3a71402b99f85acc86b7d485
+performing serial brute force md5 password hash cracking...
+---------- Serial Version ---------------
+FOUND: abcde
+Time Cost: 1.362548
+mpeterson10@cscd-gpu01:~/github/CSCD439-Project-cuda-md5-Fork/Turn In$ ./project abcde -v
+./project abcde -v
+hash for abcde: 0xd9b456ab3a71402b99f85acc86b7d485
+performing parallel brute force md5 password hash cracking...
+---------- Parallel Version ---------------
+
+
+FOUND: abcde
+Time Cost: 0.276208
